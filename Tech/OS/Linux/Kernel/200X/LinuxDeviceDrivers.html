@@ -1,0 +1,615 @@
+<html>
+
+<head>
+<title> Device Drivers under Linux - C Hanish Menon (www.hanishkvc.com) </title>
+</head>
+
+<body>
+
+<hr>
+<center>
+<h1> Device Drivers under Linux </h1>
+
+C Hanish Menon <br>
+www.hanishkvc.com <br>
+</center>
+Modified On: <br>
+Feb 2000, March 2001, Mar 2002 <br>
+Version: 2.0.2
+<hr>
+
+<hr>
+<h1> Overview </h1>
+
+<ul>
+<li> Linux
+<li> Device Driver Skeletons - Char, Block, Net
+<li> Accessing Resources 
+<li> Synchronisation
+<li> Tasking Assistants
+<li> Time
+<li> Misc - PCI
+<li> References
+</ul>
+<hr>
+
+<hr>
+<h1> Computer Architecture </h1>
+
+<pre>
+
+  |-----|       Bus (Control, Addr, Data)     |---------| 
+  | CPU |&lt;-----------------------------------&gt;| Devices |
+  |-----|                  ^                  |---------|
+     ^                     |
+     |                     v
+     |                  |-----| 
+     |                  | DMA | 
+     |                  |-----|
+     |                     ^
+     |                     |
+     |                     v                  |--------|
+     |--------------------------------------->| Memory |
+                                              |--------|
+
+</pre>
+<ul>
+<li> IOPorts (Addr, Data) (Memory mapped, IO mapped)
+<li> Interrupts (Or Polling)
+<li> DMA (PIO)
+</ul>
+<hr>
+
+<hr>
+<h1> Linux - Macro Kernel </h1>
+
+<ul>
+<li> (Kernel core + SubSystems + Drivers) -Single
+<li> Conventions for Resource Access <br> 
+     or Could lead to Disaster
+<li> Modular, HAL (to some extent)
+<li> Simple, Straight, Configurable
+<li> Kernel mode code Non pre-emptive <br>
+     However Interrupts occur, CoOperative calls
+</ul>
+<hr>
+
+<hr>
+<h1> Linux - Modular </h1>
+
+<ul>
+<li> Init_Module & CleanUp_Module
+<li> MOD_[INC/DEC]_USE_COUNT
+<li> MODULE_PARM(variable,var_type) <br>
+     var_type = [min[-max]]{b,h,i,l,s}
+<li> Symbols <br>
+     EXPORT_NO_SYMBOLS <br>
+     EXPORT_SYMTAB <br> 
+     EXPORT_SYMBOL[_NOVERS](name) <br>
+<li> User land: insmod, rmmod, modprobe
+<li> Sources: module.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Driver Interfaces </h1>
+
+<ul>
+<li> Char
+<li> Block
+<li> Network
+<li> ...
+</ul>
+
+You decide depending on the
+<ul>
+<li> Device characteristics
+<li> What kernel provides for that class of drivers
+<li> Your requirements
+</ul>
+<hr>
+
+<hr>
+<h1> CharDev - Intro </h1>
+
+<ul>
+<li> Files (VFS)
+  <ul>
+  <li> Dev file
+  <li> Usual file interface
+  </ul>
+<li> (Type, Major No)<kernel handles>, Minor No<driver> <br>
+     Major No - Device or Type of Device (i.e a driver) <br>
+     Minor No - Physical or Logical entities of Device <br>
+<li> Allows
+  <ul>
+  <li> Arbitrary length of data during i/o
+  <li> Sequential access [to same space always]
+  <li> No buffering
+  </ul>
+<li> register_chrdev, unregister_chrdev <br>
+     (MajorNo,Name,FileOperations)
+</ul>
+<hr>
+
+
+<hr>
+<h1> CharDev - Interface </h1>
+
+<ul>
+<li> Init_Module
+  <ul>
+  <li> Check Device & Resource availability
+  <li> Initialize Device
+  <li> Register Driver & FileOperations
+  </ul>
+<li> Open <br>
+     Allocate resource <br>
+     MOD_INC_USE_COUNT <br>
+<li> Read & Write <br>
+     Usual i/o <br>
+     Access_Ok(AccessMode,Area,Size) <br>
+     __Put_User(Src,Dest) <br>
+     __Get_User(Dest,Src) <br>
+</ul>
+<hr>
+
+
+<hr>
+<h1> CharDev - Interface2 </h1>
+
+<ul>
+<li> Ioctl (ioctl_nr,lparam) <br>
+     Control i/o
+<li> Close <br>
+     DeAllocate Resources <br>
+     MOD_DEC_USE_COUNT <br>
+<li> CleanUp_Modules <br>
+     Unregister Driver
+<li> __InitFunc(Common_Device_Initialize) <br>
+     Incase driver supports Static & Dynamic Modular linking <br>
+     Called from init_module(dyna) & subsystem_init_file(static) <br>
+<li> Fasync & Poll <br>
+     Allow flexible i/o from User space
+</ul>
+<hr>
+
+
+<hr>
+<h1> Poll - Polling from User land </h1>
+
+<ul>
+<li> Source: select.c, poll.h
+<li> poll_wait(file*,waitqueue*,poll_table*) <br>
+     Called within poll. <br>
+     Depending on event return suitable POLLXXXX from poll.
+<li> wake_up_interruptible(&amp;waitqueue*) <br>
+     Called from event point (interrupt handler)
+<li> User land: select/poll
+</ul>
+<hr>
+
+
+<hr>
+<h1> Fasync -Interrupt mode for User land </h1>
+
+<ul>
+<li> fs,siginfo files
+<li> fasync_helper(fd,file*,on,&amp;fasync_struct*) <br>
+     Called from fasync 
+<li> kill_fasync(fasync_struct*,SIGIO,SIGPOLL_Code) <br>
+     Called from where the event occurs <br>
+     SIGPOLL_Code <br>
+     <ul>
+     <li> POLL_IN, POLL_OUT, POLL_ERR, POLL_HUP, ...
+     </ul>
+<li> User land: open(O_NONBLOCK), SIGIO, fcntl(O_ASYNC)
+</ul>
+<hr>
+
+
+<hr>
+<h1> BlockDev - Intro (todo)</h1>
+
+<ul>
+<li> Kernel provides
+  <ul>
+  <li> Buffering
+  <li> Fixed block size
+  </ul>
+<li> Simple interface
+  <ul>
+  <li> Define certain macros and values <br>
+       blk_size, blksize_size, hardsect_size
+  <li> Predefined block_read, block_write, sync ...
+  <li> Implement <br>
+       request_handler <br>
+       interrupt_handler <br>
+       generic_blkdev_ioctls_handler
+  </ul>
+</ul>
+<hr>
+
+
+<hr>
+<h1> BlockDev - Misc (todo) </h1>
+
+<ul>
+<li> Request structure <br>
+     rq_dev, cmd, sector, nr_sectors, cur_nr_sectors <br>
+     buffer, buffer_head list <br>
+<li> buffer_head structure <br>
+     b_dev, b_rdev, b_blocknr, b_size, b_rsector <br>
+     b_data, b_next <br>
+<li> blk_init_queue(request_queue, request_handler)
+</ul>
+<hr>
+
+
+<hr>
+<h1> BlockDev - You do (todo) </h1>
+
+<ul>
+<li> Open & Close - Mount & UnMount
+<li> request_handler 
+  <ul>
+  <li> Loop thro the list of CURRENT requests
+  <li> Merge clustered request (if you feel so)
+  <li> Initiate DMA or so if any wrt device & Return
+  </ul>
+<li> interrupt_handler
+  <ul>
+  <li> end_request
+  <li> Call request_handler
+  </ul>
+<li> ioclt_handler <br>
+     geo, size, dma, flushbuffer, partinfo, readahead, ...
+<li> Source: xt.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> NetworkDev - Intro (OkOk) </h1>
+
+<ul>
+<li> Fill net_device structure
+  <ul>
+  <li> IFNames, base_addr, irq, dma, mtu, type, promiscuity
+  <li> tx_buffer, rx_buffer
+  <li> dev_addr(mac), broadcast_addr, multi_cast_addrs
+  <li> Init & Uninit <br>
+       init_etherdev, ether_setup - Initialize with defaults <br>
+       [register/unregister]_netdev(net_device)
+  </ul>
+<li> hard_header, rebuild_header ~ defaults
+<li> open, stop, hard_start_xmit, get_stats, ...
+<li> Works on packets -independent of protocol
+<li> Source: netdevice.h, skeleton.c, net/core/dev.c, net_init.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> NetworkDev - You Do (OkOk) </h1>
+
+<ul>
+<li> hardware_start_transmit, tx_timeout
+<li> do_ioctl, set_multicast_list, get_stats
+<li> interrupt_handler <br>
+     Identify & Process Reasons <br>
+     If receive_related then Trigger NET_BH <br>
+<li> Bottom_Half (part of Interrupt_handler if no BH) <br>
+     Data in dev_rx_buffer = Trigger dma, return <br>
+     recieve_dma_over = Pass to higher layers (netif_rx) <br>
+<li> Source: skeleton.c, loopback.c, via-rhine.c, rtl8139.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> Accessing Resources </h1>
+
+<ul>
+<li> SubSystems help <br>
+     Portability <br>
+     Managing Resources <br>
+<li> Manage resources <br>
+     [check| request| release| allocate]_resource
+<li> I/O operations
+<li> Sources: ioport.h, resource.c, IO_mapping.txt, DMA_mapping.txt
+</ul>
+<hr>
+
+
+<hr>
+<h1> Resource - Memory </h1>
+
+<ul>
+<li> kmalloc(size,flags) <br>
+     GFP_KERNEL, GFP_NFS, GFP_USER - can sleep <br>
+     GFP_ATOMIC - won't sleep(for Interrupt Handlers) <br>
+     GFP_BUFFER, GFP_DMA <br>
+<li> kfree
+<li> Sources: slab.c, mm.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Resource - IOPort </h1>
+
+<ul>
+<li> Request_region(start, size, name)
+<li> free_region(start, size)
+<li> I/O operations <br>
+     [in/out][b/w/l][_p] <br>
+     [ins/outs][b/w/l] <br>
+<li> Sources: ioport.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Resource - IRQ </h1>
+
+<ul>
+<li> request_irq(irq, handler, irqflags, devname, dev_id) <br>
+     SA_SHIRQ - Sharable <br>
+     SA_INTERRUPT - disable local interrupts during handler <br>
+     SA_SAMPLE_RANDOM - part of entropy poll <br>
+<li> free_irq(irq,dev_id) <br>
+     dev_id - during irq sharing
+<li> Sources: irq.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> Resource - DMA </h1>
+
+<ul>
+<li> request_dma(dmanr,devname), free_dma
+<li> set_dma_mode, set_dma_addr, set_dma_count <br>
+     virt_to_bus => address visible to io_devices 
+     (same as Physical addr (in x86))
+<li> enable_dma, disable_dma
+<li> get_dma_residue
+<li> Sources: dma.h, IO_mapping.txt
+</ul>
+<hr>
+
+
+<hr>
+<h1> Resource - IOMemory </h1>
+
+<ul>
+<li> ioremap(offset,size) <br>
+  <ul>
+  <li> map device memory to kernel segments (during initialization 
+       page mapping is provided only till top of physical memory)
+  <li> X86 => io_memory part of system_memory space But NOT Necessarily 
+       in others
+  </ul>
+<li> iounmap
+<li> request_mem_region
+<li> [read/write][b/w/l], memcopy_[from/to]io, memset_io
+<li> Sources: io.h, IO_mapping.txt, ioport.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Synchronisation - 1 </h1>
+
+<ul>
+<li> Uni processor system
+  <ul>
+  <li> save_flags(flags) - cli() - CS - restore_flags(flags)
+  <li> cli() - CriticalSection -sti()
+  </ul>
+<li> SMP
+  <ul>
+  <li> spin_lock[_irqsave](spinlock_t, flags)
+  <li> Spin_unlock[_irqrestore](spinlock_t, flags)
+  </ul>
+  Irqsave version Disables local interrupts - required 
+  if access in Interrupt context - Slower
+<li> Sources: spinlock.txt, spinlock.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Synchronisation -2 </h1>
+
+<ul>
+<li> Read Write locks
+  <ul>
+  <li> Useful if many readers and few writers
+  <li> [read|write]_lock - CS - [read|write]_unlock
+  <li> irqsave & irqrestore version also available
+  </ul>
+<li> IrqSave Restore version Disables local interrupts - 
+     required if access in Interrupt context - Slower
+<li> Sources: spinlock.txt, spinlock.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> Synchronisation - 3 </h1>
+
+<ul>
+<li> wait queue
+  <ul>
+  <li> [interruptible_]sleep_on[_timeout](wait_queue)
+  <li> wake_up[_interruptible](wait_queue)
+  </ul>
+<li> test_and_[set/clear]_bit, [test/clear]_bit
+<li> Sources: sched.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> Tasking Assistants </h1>
+
+<ul>
+<li> Reduce time spent in Interrupt context
+  <ul>
+  <li> Low priority interrupts disabled
+  <li> Same priority interrupts in pending state
+  </ul>
+<li> Acknowledge the device
+<li> Take care of device buffers.
+<li> Sources: interrupt.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> TaskAssist - Software Interrupts </h1>
+
+<ul>
+<li> New softirqs not to be defined - Use tasklets
+<li> Run simultaneously on different Processors
+<li> Require to be Re -Entrant
+<li> open_softirq(nr, func, data), raise_softirq(nr)
+<li> Sources: interrupt.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> TaskAssist - Tasklets </h1>
+
+<ul>
+<li> SMP
+  <ul>
+  <li> run simultaneously on different Processors
+  <li> A given Tasklet runs only on a single Processor 
+       at a given instant.
+  </ul>
+<li> tasklet_init(tasklet*,func,data), tasklet_kill
+<li> tasklet_enable,tasklet_disable, tasklet_schedule(tasklet*)
+<li> Sources: interrupt.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> TaskAssist - Bottom halves </h1>
+
+<ul>
+<li> SMP <br>
+     Only one Bottom Half on a given system at a time
+<li> Fixed 32 Bhs
+<li> Old use tasklets instead
+<li> init_bh(nr, func), mark_bh(nr), remove_bh
+<li> Sources: interrupt.h
+</ul>
+<hr>
+
+
+<hr>
+<h1> TaskAssist - TaskQueue </h1>
+
+<ul>
+<li> Extensions to few existing BHs
+  <ul>
+  <li> TIMER_BH, TQUEUE_BH, IMMEDIATE_BH
+  <li> Existing BH s check these lists and run them one after the other
+  </ul>
+<li> queue_task(tq_struct, bh_nr) ~ tq_struct.routine
+<li> mark_bh(bh_nr) ???
+<li> Sources: interrupt.h, sched.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> Time </h1>
+
+<ul>
+<li> HZ, jiffies
+<li> TSC -Cycle Count Register in Processor(new processors)
+<li> Dynamic timers - timer_list <br>
+     init_timer, mod_timer
+<li> xtime & do_gettimeofday - Date & Time of day (Calendar Time)
+<li> Sources: timer.h, timer.c
+</ul>
+<hr>
+
+
+<hr>
+<h1> PCI - Start </h1>
+
+<ul>
+<li> CONFIG_PCI, pcibios_present
+<li> pci_find_[device/class] ~ Old way
+  <ul>
+  <li> (Vender_id,Device_id,&till_now_pci_dev)
+  <li> (class_code,&till_now_pci_dev)
+  </ul>
+<li> pci_register_driver(pci_driver) ~ New way <br>
+     id_table, Probe, Remove, Resume, Suspend
+<li> Sources: pci.h, pci.txt
+</ul>
+<hr>
+
+
+<hr>
+<h1> PCI - Misc </h1>
+
+<ul>
+<li> pci_[read/write]_config_[byte/word/dword] <br>
+     (pci_dev,where,[ptr/val])
+<li> Misc 
+  <ul>
+  <li> pci_resource_start(pci_dev,BAR) <br>
+       check_region 
+  <li> pci_enable_device(pci_dev)
+  <li> pci_set_master(pci_dev)
+  <li> pci_find_slot(bus,devfn)
+  </ul>
+<li> PCI -DMA <br>
+     pci_alloc_consistent (i.e sync) & pci_map_single, 
+     pci_map_sg (scatter gather)
+<li> Sources: pci.h, pci.txt, DMA-mapping.txt
+</ul>
+<hr>
+
+
+<hr>
+<h1> Misc </h1>
+
+<ul>
+<li> Kernel_Threads <br>
+     Processes without user context
+<li> Threads <br>
+     Processes that share data <br>
+     Clone <br>
+</ul>
+<hr>
+
+
+<hr>
+<h1> References </h1>
+
+<ul>
+<li> LINUX Kernel Source - www.kernel.org
+<li> LXR (cross referencing package) - www.kernel.org
+<li> Grep and friends along with a Few sleepless nights :-)
+<li> Linux Module Programming - www.linuxdocs.org
+<li> Linux Device Drivers - Alexandro Rubini
+<li> Understanding Linux kernel
+</ul>
+<hr>
+
+
+</body>
+
+</html>
+
