@@ -1,0 +1,19 @@
+div.title {
+  width        : 80%;
+  margin-left  : 10%;
+  margin-right : 10%;
+  color        : blue;
+  border       : solid red;
+}
+
+div.chapter_title {
+  width  : 100%;
+  color  : blue;
+  border : solid red;
+}
+
+h3 {
+  color : red;
+  background-color : yellow;
+}
+

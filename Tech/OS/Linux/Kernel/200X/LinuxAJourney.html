@@ -1,0 +1,968 @@
+<html>
+
+<head>
+<title> Linux - a journey : C Hanish Menon (www.hanishkvc.com) </title>
+<link href="default.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<hr>
+<div class="title">
+<h1> Linux - a journey </h1>
+<address> 
+  by C Hanish Menon (www.hanishkvc.com) <br>
+  date: Jun 2001<br>
+  license: GPL for documents
+</address>
+</div>
+<hr>
+
+<hr>
+<h2> Table of Contents </h2>
+
+<ol>
+<li>THE INTRODUCTION
+  <ol>
+    <li>LINUX</li>
+    <li>GUI SYSTEM</li>
+    <li>APPLICATIONS</li>
+    <li>THE SYSTEM</li>
+  </ol>
+<li>THE LINUX SYSTEM</li>
+  <ol>
+    <li>THE LINUX KERNEL</li>
+    <li>LINUX BOOT PROCESS</li>
+    <li>CONTEXT SWITCH LOGIC</li>
+    <li>MMU SUBSYSTEM</li>
+    <li>IO SUBSYSTEM</li>
+    <li>INTERRUPT SUBSYSTEM</li>
+    <li>MISC. HAL</li>
+    <ol>
+      <li> TIMER </li>
+      <li> DMA </li>
+      <li> Keyboard Controller </li>
+    </ol>
+    <li>CHAR DEVICES</li>
+    <li>BLOCK DEVICES</li>
+    <li>NETWORK DEVICES</li>
+    <li>THE APPLICATIONS</li>
+  </ol>
+</ol>
+
+<h2> Table of Figures/Tables </h2>
+<ol>
+  <li>The System</li>
+  <li>The Linux kernel</li>
+  <li>The Linux Boot process</li>
+  <li>The Applications</li>
+</ol>
+
+
+<hr>
+<div class="chapter_title">
+<h2> Chapter 1 </h2>
+<h2> The Introduction </h2>
+<dl>
+  <dd>The integrated future.</dd>
+</dl>
+</div>
+<hr>
+
+<p>
+Technology is taking us to a future made of Integrated multi function
+devices which are compact, convenient and economical from the end user
+perspective.  Linux makes a lot of sense for such devices, what with the
+currently available Processing power and Memory in these devices. With
+internet being as popular as it is, and with the integration of Internet
+access capabilities into most of these devices the Network stacks in the
+kernel, the free and flexible GUI and InternetAccessClients available with
+Linux help a lot.
+
+<p>
+<div align="right">
+<table border="1">
+  <tr><td>KEY MODULES</td></tr>
+  <tr><td>
+  Linux<br>
+  GUI System<br>
+  Applications<br>
+  </td></tr>
+</table>
+</div>
+
+<h3>Linux</h3>
+<p>
+An Embeddable Linux System basicaly consists of a Linux kernel along with
+a mini Linux distribution. This in turn provides the system environment in
+which the other modules/applications run. It takes care  of managing the
+resources available in the system and providing it to the other modules as
+found necessary. It also takes care of abstracting the hardware features
+in friendly manner for the other modules, so that they are portable to a
+great extent.
+
+<h3>GUI System</h3>
+<p>
+The GUI system helps abstract the User Interface devices of the system
+from the applications that interact  with the  user.  It  includes drivers
+for the  Graphics Chipset and the Input devices like Keyboard or Mouse or
+IR-Gadgets.  It also takes care  of  providing  a standard Application
+Programming Interface  for the GUI   functionality,  thus allowing
+developers   to produce GUI applications. Also the look and feel of the
+applications will be standardised.
+
+<h3>Applications</h3>
+<p>
+Applications allow the end user to utilize the system in a useful manner.
+Depending on the kind of system it could consist of Personal Information
+Management kind of applications (in a PDA) like Address book, Calendar, Notes,
+Calculator, Convertor and so on. Or in case of a Internet Access Devices it
+would be the Internet access  clients namely  the Browser and Messaging
+services like the Email client and Chat. The Browser will allow the end user to
+access the World Wide Web. This will  allow  the user to access  the  rich  set
+of Information and Services available on the net.  Where as   the   email
+client  will  allow  the  user to communicate with others on the net.  Chatting
+will allow people to interact with one another on the net in realtime.
+
+<h3>The SYSTEM</h3>
+
+<pre>
+ 
+                       |------------------------|
+                       |      Applications      |     
+                       |-----------||-----------|
+                                   ||
+                                   ||
+  |-----------|     |--------------WW---------------|   
+  |          C-------D         Libraries            |
+  |  GUI      |     |-------------MM----------------|
+  |           |                   ||                         User level
+__|  System   |___________________||___________________________________
+  |           |                   ||
+  |------M----|                   ||
+         .             |----------WW------------|
+         .             | System Call Interface  |
+         .    |----------------------------------------|  
+         .    |                                        |
+         .    |       Linux Kernel with SubSystems     |   
+         .    |                                        |
+         .    |----------------|                       |
+         .    | Device Drivers |                       |
+         .    |                |                       |
+         .    |    |------------------------------|    |  
+         .    |    |   Hardware Abstraction Layer |    |   
+         .    |-------------------MM-------------------|
+         .                        ||                        Kernel level
+_________.________________________||____________________________________
+         .                        ||
+         .                        ||                        Hardware level 
+       |-W------------------------WW--------------------------|  
+       |                    Hardware                          |   
+       |------------------------------------------------------|
+
+</pre>
+                <center> Figure 1: The System </center>
+
+<p>
+A well-designed computer system is made up of a layered architecture of
+software modules running on top of the underlying hardware providing
+different levels of abstractions to different entities of the system.
+
+<p>
+The typical layers in such a system consist of
+<ol>
+<li> Hardware Abstraction Layer <br>
+     This layer allows the rest of the system to work in a portable manner
+     with out worrying about the differences that can exist in different
+     Computer systems.
+<li> Kernel <br>
+     It manages the resources available in the system and allows effective
+     and efficient utilization of it across competing processes. This
+     abstracts the resources of the system as far as the User processes
+     are concerned. Kernel exports its services to the user processes
+     through some standard programming interface mechanism.
+<li> Library <br>
+     Commonly used or required functionality is packaged into modules
+     called the Libraries. It allows for efficient conservation of the
+     storage available. It also simplifies the process of bug fixing and
+     enhancing the services provided by the library across versions
+     without affecting the applications that use it.
+<li> Applications <br>
+     These are the entities in the system, which interact with the users
+     and allow them to get some specific and or useful job done from the
+     system. They in turn could be background daemons or foreground
+     console or GUI applications.
+</ol>
+
+<hr>
+<div class="chapter_title">
+<h2> Chapter 2 </h2>
+<h2> The LINUX System </h2>
+<dl>
+  <dd>Posix compliant Unix like OS.</dd>
+</dl>
+</div>
+<hr>
+
+<p>
+Linux is a open source Unix like OS, which strives  to be   Posix
+compliant.  Its  simple,   modular   and configurable  nature makes it
+suitable  for  Embedded Systems at one end to Servers at the other.
+
+<p>
+Linux  is  also portable and extensible, thus  people have  already ported
+it to different boards belonging to  different architectures like x86,
+ppc, arm, mips, alpha, sparc,..
+
+<p>
+<div align="right">
+<table border="1">
+  <tr><td> KEY MODULES </td></tr>
+  <tr><td>
+    HAL and Subsystems <br>
+    Drivers <br>
+    System library <br>
+  </td></tr>
+</table>
+</div>
+
+<p>
+Here  we  will  be looking into the Linux  system  in terms of its Kernel
+core, the subsystems, drivers and the system interface library.
+
+<p>
+When  programming for Linux, one has to  look  at  it from two different
+aspects. One is that of the Kernel space programming this is where the
+Kernel Core,  the subsystems and drivers come into picture.  The  other is
+the  User land programming and this is where  the System Interface library
+comes into picture.
+
+
+<h3> The Linux kernel </h3>
+
+<pre>
+
+
+         |---------------------------------------------------|
+         |                L i b r a r i e s                  |
+         |--------------------------M------------------------|
+                                    |                         User Level
+ ...................................|....................................
+                                    |
+                                    |
+         |--------------------------W------------------------|
+         |              System Call Interface                |
+         |--------M--------------------------------M---------|
+                  |                                |
+                  |                                |
+                  |                                |
+      |-----------W--------------|     |-----------W-------------|
+      |        V  F  S           |     |                         |
+      |                          |     |  Process Management     |
+      |        |---------------| |     |       System            |
+      |        |File Sub system| |     |         ................|
+      |        |---------------| |     |         . Inter Process |
+      |                          |     |         . Communication |
+      |--------------------------C-----D         ................|
+      |           |    BLOCK     |     |         . Memory        |
+      | CHARACTER |--------------|     |         .    Management |
+      |           | Buffer Cache |     |         ................|
+      |           |--------------|     |         .               |
+      |           |  Low Level   |     |         .   Schedular   |
+      |           |       Logic  |     |         .               |
+      |--------------------------|     |-----M-------------M-----|
+                  |                          |             |
+                  |                          |             |
+                  |                          |             |
+          |-------W--------------------------W----------|  |
+          |      Subsystems                             |  |
+          |                |-------------------------------W--|
+          |                |    Hardware Abstraction Layer    |
+          |                |                                  |
+          |------M---------|------------------MM--------------|
+                 |                            ||            Kernel Level
+ ................|............................||.........................
+                 |                            ||          Hardware Level
+        |--------W----------------------------WW---------|
+        |                Hardware                        |
+        |------------------------------------------------|
+
+</pre>
+             <center> Figure 2: The Linux kernel </center>
+
+<p> 
+The Linux kernel is what I would like to call a Macro kernel. The
+kernel image consists of the kernel-core, subsystems and the drivers as a
+single entity from hardware perspective during runtime as in a Monolithic
+kernel. However it's a Modular  kernel in that these subsystems and
+drivers can be written  as modules, which can be loaded and unloaded
+dynamically in a running system. Also its contents   and functionality
+can be selectively exported to  other modules or the system. These
+features give it most of the advantages of a Micro kernel at the same time
+not having the overhead of  Message passing across different  Context
+levels as found in the  tasks forming  the Micro kernel, as the Modules
+act as a Monolith entity once they are loaded into the kernel.
+
+<p> 
+This in turn means that the conventions specified for accessing  or
+managing resources should  be  followed properly or else the stability of
+the system  can  be compromised by flaky kernel space code.
+
+<p>
+The  Linux  kernel is non pre-emptive in  the  kernel space. Well how ever
+this is not a problem as
+
+<ol>
+<li> Interrupts and their handlers still work.
+<li> All well behaving kernel code are co-operative, in that when ever
+     they have to wait for anything, they give back control so that the
+     system can continue with other things in the mean while.
+</ol>
+
+<p> 
+The  Modular  nature of Linux allows one  to  add  or remove drivers
+in a running system without rebooting.  It  also allows new drivers or
+subsystems to be added to a running system.
+
+<p> 
+The  drivers in Linux can be categorized into 3  main groups namely Char,
+Block and Network drivers.  Based on   the   functionality  provided by
+Kernel,   the functioning  of the device and ones requirements  one has to
+write driver for the corresponding subsystem in the kernel. There are also
+other models for programming drivers related to specific devices like say
+sound.
+
+<p>
+When porting Linux to a new system/target we will  be  mainly dealing with
+the HAL layer of  Linux and also adding some new drivers for Linux. Next
+we will be creating a new mini linux distribution consisting of the
+required libraries, applications and their resources.
+
+<p>
+The HAL of Linux takes care of issues like
+
+<ol>
+<li> Task Context and switching
+<li> Memory management unit
+<li> I/O subsystem
+<li> Interrupt subsystem
+<li> Inter process communication
+<li> Timer, DMA, UI devices, ...
+</ol>
+
+<p> 
+A  lot  of these areas will be touched upon when  the system boots. So
+we shall look into the typical Linux boot  process  first. Later we will
+be  looking  into some  of  these other areas like Task switching,  MMU
+logic, I/O, Interrupts, drivers and so on.
+
+
+<h3> Linux Boot process </h3>
+
+<pre>
+
+                                    |-------------------------------------|
+                                    | Compressed/Relocatable Kernel Image |
+                                    |-------|||---------------------------|
+                                            |||
+  |-----------------------------------------WWW------|
+  |      Kernel Boot Strap (assembly) start          |
+  |--------------------------------------------------|
+  |               [arch/boot/xyz..]                  |
+  |  1 Setup and Clear BSS                           |
+  |  2 Minimal Page Table and Cache initialization   |
+  |  3 Inflate and Relocate the kernel if required   |
+  |  4 Clean, Flush and Switch off cache             |
+  |  5 Jump to kernel (_stext)                       |
+  |                                                  |  
+  |-----------------||-------------------------------|
+                    ||
+                    ||              |---------------------|
+                    ||              | Normal Kernel Image |
+                    ||              |-------|||-----------|
+                    ||                      |||
+  |-----------------WW----------------------WWW------|
+  |  Pre Kernel Initialization (assembly) _stext     |
+  |--------------------------------------------------|
+  |            [arch/kernel/head.s ++]               |
+  |  1 Verify Processor and Architecture types       |
+  |  2 Initialize arcitecture if any                 |
+  |  3 Setup Initial Page-Table                      |
+  |  4 Setup/initialize any debug related minimal    |
+  |    device                                        |
+  |  5 Clear BSS and setup Stack                     |
+  |  6 Jump to start_kernel                          |
+  |                                                  |  
+  |-----------------||-------------------------------|
+                    ||
+                    ||                         
+  |-----------------WW-------------------------------|
+  |   In Kernel Initialization (C) start_kernel      |
+  |--------------------------------------------------|
+  |            [init/main.c]                         |
+  |  1 Announce Linux                                |
+  |  2 Architecture specific setup and               |
+  |    Process command-line                          |
+  |  3 CPU Subsystem setup                           |
+  |  4 Memory management setup                       |
+  |  5 Process management setup                      |
+  |  6 Allocate Buffers/Memory                       |
+  |  7 Start Init - the kernel thread                |
+  |  8 Do CPU Idle                                   |
+  |                                                  |  
+  |-----------------||-------------------------------|
+                    ||
+                    ||                         
+  |-----------------WW-------------------------------|
+  | In Kernel Initialization (C) Init - KernelThread |
+  |--------------------------------------------------|
+  |            [init/main.c]                         |
+  |  1 Architecture specific Fixups                  |
+  |  2 Bus and Device setup                          |
+  |  3 Make initcall s (for all subsystems)          |
+  |  4 Multistage Root file-system mounting          |
+  |  5 Free initialization related memory            |
+  |  6 Transform to user_space_Init process          |
+  |                                                  |  
+  |--------------------------------------------------|
+
+</pre>                          
+      <center> Figure 3: The Linux Boot process </center>
+
+<p>                          
+The  Linux  boot process can be roughly  broken  down into 3 parts they
+are the
+
+<ol>
+<li> Kernel bootstrapping
+<li> Pre Kernel Initialization
+<li> In Kernel Initialization
+</ol>
+
+<p> 
+Depending  on  the  Architecture  and  the  available firmware support
+and working environment the  kernel bootstrapping process could be almost
+non-existent to consist  of kernel and initrd (initial ramdisk) inflating
+and relocation. Next it passes control to the Pre Kernel initialization
+part which  is mainly written in assembly language of  the given processor
+architecture.
+
+<p> 
+Once  the  control has been passed to the Pre  Kernel initialization
+part of the kernel. It starts by doing any   minimal  architecture
+specific  initialization (interrupts  are  disabled  for  one) and maybe
+even setup minimal exception handlers,  followed by setting  up  of  the
+initial  page  table.  Next  it initializes any available debugging aids
+and jumps to the  architecture  independent start_kernel  routine, which
+is in C language.
+
+<p> 
+
+The  Kernel  proper starts by asking an  architecture specific routine  to
+do  any  setup   specifically required for that architecture, as well as
+asking  it to  get the command line and other parameters passed to it by
+the boot strap loader logic if any.  Next the Command line arguments  are
+put into proper environment variables for other parts  of the  kernel  to
+access it. Next Exception or  Trap handlers  are  setup, followed  by
+setup   of   the Interrupt subsystem. The Scheduler is setup and  the
+System  timer is initialized.  Also the console  logic is initialized so
+that the kernel can communicate to the  user.   The Module mechanism of
+the kernel  gets setup  next.  Setting  up of  the  Cache and  Memory
+Management  logic follows this.  The proc  filesystem, which allows
+kernel to communicate with  the  user space in a structured manner, is
+activated. Also  any of the  modern  day kernels use  lot  of buffering
+strategies  for different mechanisms to increase  the efficiency in the
+system, so does the Linux  kernel, so any  buffers  or caches required
+are  setup  and allocated    next.  Signals    and Inter-process
+Communication   is setup  to  allow processes   to communicate  and
+synchronize with one another.  The init kernel thread is started and the
+kernel goes  to the cpu_idle loop.
+
+<p>
+
+The  init kernel thread gets scheduled next. At  this moment  in  time the
+system is in a stable state  and the  basic  systems  like  CPU,  Memory
+and  Process management are up and running. The thread  starts  by doing
+any architecture specific fix-ups. Setting  up the  Bus  systems if any
+and then the Devices,  which are attached to these busses, is achieved.
+One of the key  advantages  of the Linux kernel is  a  standards compliant
+Networking stack. The next job of the  Init kernel  thread is to start the
+Networking  subsystem.  The   different   systems  within  the   kernel
+are initialized   next  by  going  thro   the   list   of initialization
+routines   in   the   initialization specific  section of the kernel
+image.  The  code  is setup;  using linker related commands, such that the
+initialization  routines  of  the  different  systems within  the kernel
+fall  into  this  Initialization specific section. This also takes care of
+loading the Initial  ram disk (initrd) (or is it or maybe some part of
+this is occuring as part of the setup_arch call in start_kernel). This is
+a very  important file-system  in  embedded  systems,  where  secondary
+storage  based file-systems are usually lacking.  The linuxrc
+script/executable within the root  directory of  the initrd system is
+executed next. In a embedded system  this in itself could be the end of
+the  boot process. However if organized differently (or  also in  a normal
+system), the actual root file-system  is mounted  next  and  the system
+designer  is  given  a chance  to  retain the already mounted initrd
+file-system.  All the initialization related memory  (both data and
+function)  is freed  up to  conserve  the precious  little memory.  This
+is easily  achieved  as all  initialization related contents are bundled
+into special  sections in the kernel image. An interesting part of the
+code runs next in that the init  kernel thread  Starts  up  the console
+and  then  transforms itself into  a User space process by execve-ing  the
+init  application,  which should  be  located  in  a suitable place in the
+real root file-system.
+
+
+<h3> Context Switch logic </h3>
+
+<p> Context  switching  is a key and frequently  utilized feature  of  any
+Multiprogramming OS. It  allows  the kernel  to save the context of the
+currently  running process  and  replace  it with the  previously  saved
+context  of  the next process to run. This  logic  in turn is usually
+triggered by the Scheduler, which  in turn  decides  the scheduling
+algorithms  to  use  in order   to  provide  the  required  process
+running behavior.  In  Linux the context switching  logic  is part  of HAL
+and Scheduler is part of the  Platform independent code.
+
+<p> The  context  switch logic in the HAL is  implemented using the
+<b>switch_to</b> macro. Its job is to save general-purpose  and
+special-purpose registers.  In  case  of special-purpose registers they
+are saved and restored only if  required,  this  is  especially  true for
+registers  like  the  fpu registers  and  the  debug registers.
+
+
+
+<h3> MMU subsystem </h3>
+
+<p> The MMU is a very essential part of any OS today.  It provides many
+advantages like
+
+<ol>
+<li> Protection of code and data belonging to  one application from
+     another applications. Thus even if one program / process misbehaves
+     only it will be killed and other processes can continue executing.
+     
+<li> Allow multiple processes to run even if the total available memory in
+     the system is not able to satisfy the memory requirements of all the
+     processes in the system at any given point of time. This is achieved
+     by maintaining only the currently accessed part of the processes in
+     Memory. And the other parts of the system are swapped in and out as
+     required to utilize the available main memory efficiently.
+
+<li> As the processes will be able to access memory only through the
+     virtual address space, a process can be provided a large contiguous
+     virtual memory space even thou internally it could be non-contiguous
+     in the physical memory chips.
+
+<li> Code can be transparently relocated to different areas in the
+     physical memory space by updating the virtual to physical mapping
+     suitably.
+</ol>
+
+<p> Linux   being   a   multiprogramming/multi-user   OS, utilizes  the
+MMU to achieve the above stated  goals.  As  Linux  is  designed to be
+portable in  the  newer versions,  the hardware dependant parts  of  the
+MMU logic  are  isolated  into  the  HAL  of  Linux.  The following  are
+some  of the key requirements  to  be satisfied by the MMU module of HAL
+in Linux.
+
+<ul>
+<li> <b>switch_mm</b>   -  scheduler  calls  this   during preparation
+     for  context switch so  that  the  MMU related data structures can be
+     set up properly  for context switch.
+  
+<li> Constants used by other parts of the system
+  <ul>
+  <li> <b>PROT_NONE/READ/WRITE/EXEC </b><br>
+       Used  in  memory  related data  structures  to verify  the
+       protection bits  associated  with the memory area under
+       consideration 
+       
+  <li> <b>MAP_SHARED/LOCKED/ANONYMOUS/PRIVATE/FIXED.</b><br> 
+       Used  to  specify attributes  to  the  memory- mapped areas
+  </ul>
+
+<li> The  Linux  kernel  assumes a 3  level  page  table mechanism
+  consisting of
+  <ul>
+  <li> Page Global directory (PGD)
+  <li> Page Middle directory (PMD)
+  <li> Page Table (PAGE/PTE)
+  </ul>
+  And  the paging provided by the target hardware  is mapped  into  this 3
+  level architecture  by  short- circuiting any of the levels if required.
+  As  part of  this  certain constants require to  be  defined they are 
+  <ul>
+  <li> <b>[PGDIR/PMD/PAGE]_[SHIFT/SIZE/MASK] </b>- this gives the size of
+       memory space controlled by any given entry in the corresponding
+       level table. And the MASK corresponds to the bits in the address to
+       be used to look up in the corresponding table.
+  <li> <b>PAGE_OFFSET</b> - gives the starting address of the kernel space
+       in the Virtual address space of any given process in the system.
+       This simplifies the logic required to access the kernel context
+       irrespective of the process, which is currently running in the
+       system.
+  <li> <b>PTRS_PER_PTE/PMD/PGD </b>-These give the number of entries in
+       the corresponding level table. If the CPU / Hardware supports less
+       number of paging levels than what Linux emulated (3 level), then
+       the corresponding entry will be set to 1.
+  <li> <b>[copy/clear]_page </b>- Used to work on the pages
+  </ul>
+
+<li> Any MMU hardware will provide certain attribute bits to be associated
+  with the pages in the system, so  that things like memory protection and
+  swapping can be achieved. In Linux certain standard functions are
+  defined to  work on these  normally  required attributes.  Its up to the
+  porting team  to  define these functions suitably for their
+  architecture. The important among these are
+
+  <ul>
+  <li> <b>[pgd/pmd/pte]_[present/bad/none/clear]</b>- these work on the
+       corresponding level table entry in terms of verifying whether it is
+       present and or valid and also allowing it to be set to NULL
+       equivalent.
+  <li> <b>pte_[read/write/dirty/young]</b> - The corresponding attribute
+       is set in the page table entry.
+  <li> <b>pte_[rdprotect/wrprotect]</b> - The related attribute is negated
+       in the page table entry
+  <li> <b>[pgd/pmd/pte]_offset</b> - these help find the entry associated
+       with a address in the corresponding level page table.
+  <li> Others
+  
+       <ul>
+       <li> <b>[pgd/pmd/pte]_[alloc/free]</b>
+       <li> <b>pte_[mkclean/mkold/mkread/mkwrite/mkyoung/mkdirty]</b>
+       </ul>
+       
+  </ul>
+
+<li> <b>do_page_fault</b><br>
+  
+     do_page_fault  first  obtains  the  unaccessible address  from the
+     related CPU control  register.  If  the  address  is within the
+     virtual  address space   of   the  process,  the  fault  probably
+     occurred,  because the page was not swapped  in, write  protected  or
+     something similar.  So  the corresponding logic is triggered to
+     rectify  the situation.  If on the other hand the address  is not
+     valid,  there is no vma that contains  this address,  then the kernel
+     takes suitable  action like   sending  a  SIGSEGV  to  the
+     associated process.
+
+<li> <b>TLB</b> is a very important component of any MMU in that it speeds
+  up the page table lookups by acting as a cache for the frequently
+  accessed entries. However as  with  any other cache only a limited
+  amount  of entries can be stored in the TLB at any given  time and also
+  across context switches they required to be handled properly. To achieve
+  these Linux assumes that the porting team provides certain functions.
+  The main once are
+  
+  <ul>
+  <li> <b>tlb_exception_handling</b>
+  <li> <b>Flush_tlb_all/mm/page/range/pgtable</b>
+  </ul>
+
+<li> Functions  required  by  modules  to  get  the different memory space
+  views of a given address  in the system are
+  
+  <ul>
+  <li> <b>bus_to_virt/virt_to_bus</b> - these give the mapping between a
+       given virtual address and the equivalent address on the Bus. This
+       is required for devices which can drive the memory bus on their
+       own.
+  <li> <b>phys_to_virt/virt_to_phys</b> - this is required  to get the
+       relative mapping between the virtual and its corresponding physical
+       address.
+  </ul>
+
+</ul>
+
+
+<h3> IO subsystem </h3>
+
+<p> The  I/O subsystem which is part of the HAL of  Linux allows  device
+drivers to access  control  and  data space  of the devices in a
+architecture neutral form, without having to worry about whether its i/o
+mapped or  memory mapped, or whether caching issues have  to be taken care
+or not and so.
+
+<p> First of all one is required to get the address space of  the device
+recognized by the system this is where the  routines
+<b>ioremap[_nocache]</b> and <b>iounmap</b> come into picture.
+
+<p> Once  the required address space has been mapped  one is normally
+required to read and write on this space.  This is where routines like
+<b>read</b>[<b>b</b>yte/<b>w</b>ord/<b>l</b>ong] and
+<b>write[byte/word/long]</b> are used. Also functions like <b>memset_io,
+memcp_toio, memcp_fromio</b>  are  used  when working on a chunk of
+address space at a time.
+
+<p> If working on I/O mapped devices
+
+<ul>
+<li> <b>out[b/w/l] and in[b/w/l]</b> are used when working on a single
+     I/O.
+<li> <b>outs[b/w/l] and ins[b/w/l]</b> are used when working on a string
+     version of I/O.
+<li> <b>[in/out][b/w/l]_p</b> are used when a pause is required between
+     I/O operations.
+</ul>
+
+<p> Also  issues  like  Cache  coherency  and  DMA,   I/O operations  on
+certain busses  like  ISA  and  other quirks require to be handled here.
+
+
+<h3> Interrupt Subsystem </h3>
+
+<p> Linux  has  a  controller-independent  x86  interrupt architecture.
+Every controller  has  a  'controller- template'  that is used by the main
+code  to  do  the right thing. Each driver-visible interrupt source  is
+transparently  wired  to the appropriate  controller.  Thus  drivers  need
+not be aware of  the  interrupt-controller.
+
+<p> The code and the controller-template are designed  to be   easily
+extended  with  new/different  interrupt controllers,  without having to
+do  assembly  magic.  This  controller-template forms part of  the  HAL
+in Linux.
+
+<p> The   controller-template  is  specified  by   struct
+hw_interrupt_type. It consists of
+
+<ul>
+<li> Controller <b>id/name</b>
+<li> Followed by routines for <b>startup and shutdown</b> of
+     the controller.
+<li> It also contains routines to <b>enable and disable</b>
+     interrupts.
+<li> The code to <b>acknowledge</b> the activation of an
+     interrupt and any code that requires to be done at
+     the <b>end</b> of the interrupt also require to be
+     implemented.
+<li> One may also provide a <b>set_affinity</b> routine
+     which allows one to specify as to which and all CPUs
+     in a SMP system can be allowed to handle a given
+     interrupt.
+</ul>
+
+
+<h3> HAL (Misc.) </h3>
+
+<h4> Timer </h4>
+
+<p> Timer is an important component as it is the heart beat of the system.
+It gives a mechanism for all modern day OS's to periodically get control
+from the user process and see if any new process requires to be scheduled
+into the system, thus achieving Preemption. It also helps keep the
+time_of_day up to date.
+
+<p> The Timer Chip related functions belong to the HAL of Linux. As part
+of this one is required to implement <b>time_init function</b>, which is
+called during booting. It is supposed to initialize the timer chip to a
+known state and setup the system timer appropriately and associate the
+<b>timer_interrupt-handler</b> for it. In many cases the <b>default
+timer_interrupt</b> logic could be enough. However if some additional work
+is required related to the target then a
+<b>new-timer_interrupt-handler</b> should be defined which in turn calls
+the <b>default-timer_interrupt-handler</b>.
+
+<p> The other key functions that one may require to implement are
+<b>do_gettimeofday and do_settimeofday</b>. These are used by the system
+when one requires querying or setting of the wall or calender-time.
+
+
+<h4> DMA </h4>
+
+<p> DMA is required to allow data transfer between the device and memory
+without the intervention of the CPU. Thus the available resources in the
+system can be utilized efficiently by doing things in parallel.
+
+<p> The DMA functionality is abstracted as part of the HAL in Linux. So
+the module, which uses DMA, doesn't have to worry about the differences in
+the DMA Controller.
+
+<p> The functions that require to be implemented as part of the HAL are
+
+<ul>
+<li> enable_dma and disable_dma 
+<li> set_dma_page, set_dma_addr, set_dma_count and set_dma_mode used to
+     configure the parameters required before a DMA transfer can start.
+<li> get_dma_residue used at the end of the DMA transfer to identify 
+     the status of transfer.
+</ul>
+
+<h4> Keyboard Controller </h4>
+
+<p> Setup <b>Interrupt_Handler or Polling mechanism (using Timers)</b> as part
+of the keyboard controller <b> initialization </b> routine so that any keypress
+or keyrelease event can be recoginized by the kernel. Routines triggered by
+them inturn look into the got row and column status or other code and convert
+it suitably as required to the kernel specified scancode using tables.  This
+scancode is inturn along with the key Up/Down status is passed to the
+<b>Platform independant handle_scancode</b> routine.
+
+
+
+<h3> Char devices </h3>
+
+<p> Char  devices  is  one of the most flexible  driver related interface
+available in Linux. It allows for arbitrary length of data transfer during
+I/O.  Also kernel doesn't provide any buffering for this class of
+drivers, thus whatever I/O that occurs in these drivers  directly  affects
+the underlying  hardware immediately.
+
+<p> The  char  driver  interface  allows  the  hardware device  to  be
+abstracted as a File as far  as  the user applications are concerned. This
+in turn would mean  that one can use common functions like  open, read,
+write, close on these devices.
+
+<p> Common Device interface functions for this class of devices are
+
+<ul>
+<li> <b>Init</b> is used when a driver is loaded to verify that the
+     required resources are available in the system. If all the required
+     resources are available and no other driver is currently controlling
+     the device then the driver is successfully loaded.  Also the char
+     device related functions of  the driver are registered with the
+     system. Similarly when the driver is no longer required <b>Clean</b>
+     is called, it should free up allocated resources if any. It also
+     un-registers the services of  the driver from the system.
+<li> <b>Open</b> is called when some application/process requests the
+     services of the driver by trying to access the device special file.
+     It should allocate the required resources if any and setup the
+     internal context suitably. Once the user has finished using the
+     device he will inform the system by calling <b>Close</b>, so the
+     driver should free up the allocated resources.
+<li> <b>Read &amp; Write</b> is used whenever one wants to communicate
+     data with the device. However if the user wants to send any control
+     commands or check the status associated with the device then he
+     should use the <b>Ioctl</b> mechanism.
+<li> <b>Mmap</b> is used to allow the device address space to be mapped
+     into the virtual address space of the process. This also for
+     simplified and straightforward interaction between the process and
+     the device.
+<li> <b>Poll</b> allows the driver to provide the select based System C
+     Library mechanism. Which allows the user process to wait/check on
+     multiple events from multiple devices in a non-blocking manner.
+<li> <b>Fasync</b> allows the user of the device to use an Interrupt mode
+     of operation from user space when doing I/O with the device. This
+     allows for a non- blocking device usage.
+<li> <b>LlSeek</b> allows the current file-position associated with the
+     device to be updated as required.
+<li> Other functions which could be implemented in some cases are
+     <b>Flush, FSync, ReadV, WriteV </b>.
+</ul>
+
+
+<h3> BLOCK devices </h3>
+
+<p> Block  device  class of drivers in Linux  is  usually used for storage
+kind of devices. The kernel provides support  for  Buffered I/O on this
+class of  devices.  Also  the driver doesn't have to worry about  varying
+I/O  data sizes, as the kernel translates them  to  a series of fixed
+block size transfers.
+
+<p> Even  block  devices are available to the user  space through  the
+usual file abstraction. However most  of the  file  related  I/O logic is
+implemented  by  the kernel  so as to provide for Buffered I/O, Clustering
+of  I/O  requests for better efficiency when  working with such devices.
+So the driver is only required  to provide  implementation for certain
+low-level  device I/O operations.
+
+<p> Thus  looking  into the structure of a  Block  Device driver
+
+<ul>
+<li> First define certain macros and values like
+  <ul>
+  <li> <b>blk_size</b>  - the size of the block  device; <b>blksize_size</b> -
+       the size of each block  in  the device(logical); <b>hardsect_size</b> -
+       the size of the physical sector of the device.
+  </ul>
+  
+<li> Then   implement  functions  related  to   the block_device_operations
+  registered  through  block-device registration function.
+  <ul>
+  <li> <b>Open and Release</b> called during Mount and Un- Mount under normal
+       course. Or even a process could directly call Open and Release.
+  <li> <b>generic_blkdev_ioctls_handler</b> used to handle common ioctls
+       associated with block devices namely partinfo, geometry,  dma, read-
+       ahead, flush-buffer, size.
+  <li> Similarly <b>check_media_change and revalidate</b>
+  </ul>
+  
+<li> Now  you have to worry about one of the crucial functions  of the block
+  device namely the <b>request-handler</b>. It is required to go through the
+  current list  of  queued requests. Do merging of  clustered requests  if you
+  feel so. And finally work  on  the request   by   starting  DMA  or  other
+  necessary processing. The request-handler is associated with a request queue
+  by using the <b>blk_init_queue</b> function.
+
+<li> The final important functional entity of the Block-driver is the
+  <b>interrupt-handler</b>. It verifies the reason for the interrupt. If it
+  relates to the notification of ending of a previously triggered request in
+  the request-handler then the end_request related logic is called and finally
+  the request-handler is recalled.  
+
+</ul>
+
+
+<h3> Network Devices </h3>
+
+<p> Network devices are a class of device drivers,  which don't  use  the
+device special file based user  space naming/addressing  of  the  devices.
+They  use   the concept of sockets to abstract the networking  logic.  However
+the  Network device driver doesn't  have  to worry about all these issues, they
+work on packets  - independent of protocol contained in these packets.
+
+<p> To  implement a network device driver one is  got  to fill   the
+<b>net_device</b>  structure  first.  It  mainly contains things like
+
+<ul>
+<li> IF  Names,  base_addr, irq, dma,  mtu,  type, promiscuity
+<li> tx_buffer, rx_buffer
+<li> dev_addr (mac), broadcast_addr, multi_cast_addrs
+</ul>
+
+<p> <b>Init</b>, which is called when the driver is loaded, make calls to
+<b>init_etherdev or ether_setup</b> as required  to initialise  the  net_device
+structure  with  suitable defaults.  Next it calls <b>register_netdev</b> to
+register its services with the kernel. Finally when the driver is   no   longer
+required  Un-Init  is   called   to unregister_netdev.
+
+<p> <b>Hard-Header &amp; Rebuild-Header</b> are called before packets  are sent
+out, if one requires to set-up  the headers  in  any  special way or get
+destination  mac address  using  any  proprietary  mechanism  or   so.
+Normally  this  job is left to the  default  handlers provided by the kernel.
+
+<p> <b>hardware_start_transmit, tx_timeout</b>
+
+<p> <b>do_ioctl, set_multicast_list, get_stats</b>
+
+<p> <b>Interrupt-Handler</b> as usual is a important  entity  of the  driver.
+It is required to identify and process the Reasons associated with the current
+interrupt. If the interrupt  is related to a receive event it  normally
+triggers the NET_BH related bottom-half handler.
+
+<p> <b>Bottom-Half</b> (part of interrupt-handler if no BH) is required to
+trigger DMA operation if there is Data in the  Device-Receive-Buffer. However
+if  the  BH  was triggered related to the Receive-DMA-Over event  then it  is
+required to pass the just received packet  to the  higher  layers of the
+network stack  by  calling <b>netif_rx</b>.
+
+
+<h3> The User layer </h3>
+
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+     <center> Figure 4: The Applications </center>
+
+</body>
+</html>
