@@ -1,0 +1,236 @@
+***********************
+Programming under Linux
+***********************
+
+1 Introduction
+--------------
+
+Linux is a open source Unix like OS, which strives to be Posix compliant.
+Its simple, modular and configurable nature makes it suitable for 
+Embedded Systems at one end to Servers at the other. 
+
+Linux is also portable and extensible, thus people have already ported it 
+to different boards belonging to different architectures like x86, ppc, 
+arm, mips, alpha, sparc, ..
+
+Programming under Linux can be looked into from two angles. They are
+User land programming and Kernel land programming.
+
+
+2 User land programming
+-----------------------
+
+Unix programmers will find themselves in familiar terrain when programming 
+under Linux. This is because of 2 reasons.
+
+* Linux tries to be System V complaint for most part of the 
+  system call interface. Where ever BSD has a better implementation, 
+  Linux does use it. The best example of this being the BSD Socket 
+  interface.
+
+* Also Posix complaint programs will compile straight of the source 
+  as Linux is Posix complaint.
+
+The above two reasons make adding support for running of binary programs 
+from other flavors of Unix a breeze to a great extent. The IBCS 
+(Intel Binary Compatible) package of Linux in-turn provides this support 
+to a great extent.
+
+Unix systems export kernel functionality as a set of C calls called the 
+System calls. And the Standard System C Library package in turn provides 
+the header files as well as the libraries to allow user programs to use 
+these system calls.
+
+
+We will be looking into the commonly used System calls here. One can always 
+go through any of the standard Unix programming books to learn more about 
+programming under Linux or Unix. Or one could also look into the man or 
+info documents available in any standard Unix system for info on most of 
+these calls.
+
+The commonly used system calls can be divided into the following groups
+
+2.1 Process related
+-------------------
+
+Process management is one of the key functionality provided by any OS, 
+as it allows the user to get work done from the system in a 
+predetermined way.
+
+There are 2 aspects to this management. One is that of Execution and the
+other is that of Synchronization.
+
+Linux provides two paradigms for Tasking they are the Process paradigm and 
+the Thread paradigm. Also linux does Preemptive scheduling. If a process 
+with a higher static priority gets ready to run, the current process will 
+be preempted and returned into  its wait  list. The  scheduling policy only 
+determines the ordering within the list of runnable processes with equal 
+static priority.
+
+
+2.1.1 Execution
+---------------
+
+* fork
+  Allows one to create a new execution context or process. 
+  The return value is used to determine as to whether one 
+  is in the Parent context or the Child context. A copy of 
+  the current Parent process context is  given to the Child 
+  at the time of forking. 
+
+* execve
+  This allows a process to change its Context fully based on
+  a executable file. There are many variants of this basic 
+  function which allows one to control the execution environment
+  of the process to different extent.
+
+* wait
+  Allows the parent to query the exit status of its children. 
+  It can also be used by a parent to wait for a child to exit 
+  before continuing with its job.
+
+* kill
+  Allows a process to send Signals to other processes on the 
+  system.
+
+* exit
+  Used by a process to terminate itself.
+
+* sched_getscheduler / sched_setscheduler
+  This is a Posix complaint call which allows a process to 
+  change its Scheduling principles to Real Time Scheduling.
+  Linux provides support for 3 kinds of Scheduling strategies 
+  they are
+
+  * SCHED_OTHER
+    This is the default schedular used for normal processes.
+    This is used to provide the TimeShared multitasking normally
+    required in a Server/ Workstation kind of enviornment with
+    MultiTasking and MultiUser support. It also uses Dynamic 
+    Priority mechanisms on top of the Static priority associated
+    with the process to provide for fare CPU resource distribution.
+
+  * SCHED_FIFO
+    This is a RealTime Schedular provided with Linux, as part of
+    the Posix system. As the name suggests the Processes using
+    this startegy at a given Priority Level will be processed 
+    in a First Come First Serve basis. Also unless the Current
+    process running with this scheduling strategy yeilds 
+    controls or gets blocked in I/O, the remaining Processes in 
+    the Current priority level list don't get CPU time.
+
+  * SCHED_RR
+    This is the other RealTime scheduling provided by Linux. This
+    is an offshot of SCHED_FIFO, in that, here all the processes
+    using this strategy at a given level will be scheduled in a
+    round robin basis, once their respective time quantum has 
+    expired.
+
+* sched_yield
+  This is used by a RealTime process to yield control back to the system
+  voluntarily so that other processes of _equal_ priority can be scheduled 
+  in. However as the process will be put back into the Ready list of the
+  given priority level, no processes of lower priority can run unless they
+  get blocked or exit the system.
+
+
+2.1.2 Synchronization
+---------------------
+Linux allows process to communicate and synchronize among themselves using
+different IPC mechanisms. The commonly used techniques are:
+
+* Signals
+  * sigaction / signal / sigreturn
+  * sigsuspend / sigpending / sigprocmask
+* Semaphores (kernel entry: ipc)
+* Messagebox (kernel entry: ipc)
+* Shared Memory (kernel entry: ipc)
+
+* alarm
+
+
+
+2.2 File System related
+-----------------------
+
+2.2.1 Device i/o
+----------------
+* open
+* read
+	write
+	close
+	ioctl
+	fcntl
+	poll / select
+	lseek
+	mknod
+	mmap / munmap
+	ioperm / iopl
+
+
+2.2.2 Directory and Others
+--------------------------
+
+	mkdir / rmdir / chdir /getcwd
+	readdir
+	link / unlink / symlink
+	mount / umount
+	dup
+	lock / flock /mlock
+
+2.3 Management related
+----------------------
+
+chown
+chmod
+chroot
+getuid / setuid
+getgid / setgid
+getppid / getpgid
+ulimit / umask 
+stat / lstat / fstat / ustat
+sysctl
+
+
+
+
+Kernel Mode programming
+-----------------------
+
+This mainly involves module programming for Linux. Modules allow 
+
+a) New Subsystems to be added
+b) New drivers to be added
+c) Replace / Modify certain existing behaviour
+
+with out rebooting the system. It also helps better utilize the resources available in the system.
+
+When developing modules for linux one has to look into
+
+Linux Kernel
+
+Driver interfacing with kernel
+char
+block
+network
+
+
+ Accessing resources
+Memory
+IOPorts
+IRQ
+DMA
+IOMemory
+
+Synchronization
+Semaphores / Mutex
+Spinlocks
+Wait queues
+
+Tasking assistants
+Software IRQ
+Tasklets
+BH
+
+Time
+
