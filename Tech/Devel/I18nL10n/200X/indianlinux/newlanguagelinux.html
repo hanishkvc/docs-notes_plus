@@ -1,0 +1,160 @@
+<html>
+<head>
+<title> Adding support for New language in Linux </title>
+</head>
+
+<body bgcolor=#FFFFFF>
+
+<center> 
+<table><tr>
+<td bgcolor=#f4E149>
+<h1> Adding support for </h1>
+</td>
+<td bgcolor=#edf9f9>
+<h1> New language </h1>
+</td>
+<td bgcolor=#77f449>
+<h1> in Linux * </h1>
+</td>
+</tr></table>
+</center>
+
+<hr>
+<h2> Whats required to support <b>a language</b> in computers </h2>
+<ol>
+<li> [Binary representation] A character encoding standard, which identifies 
+     the characters of the language to their binary representation in the 
+     computer.
+<li> [Output] A font which maps these characters to their respective glyphs.
+<li> [Input] A keyboard mapping which converts
+  <ol>
+  <li> scancode to the language character encoding (at a lower level)
+  <li> From one Character encoding to another (at a higher level)
+  </ol>
+</ol>
+
+<hr>
+<h2> How to support <b>multiple languages</b> simultaneously </h2>
+<ul>
+<li> Character Encoding
+  <ol> 
+  <li> [Internal tagging] A unified Character encoding standard, 
+       for the given set of languages. <br>
+       Say UNICODE (Even with its quircks).
+  <li> [External tagging] The character strings are tagged using 
+       some predefined keywords.
+  </ol>
+<li> Output
+  <ol>
+  <li> A font which provides glyphs for all the languages
+  <li> A system which changes fonts as required depending on the 
+       language character being displayed
+  </ol>
+<li> Input
+  <ol>
+  <li> On the fly Keyboard mapper 
+  <li> a OnScreen keyboard
+  </ol>
+</ul>
+
+<hr>
+<h2> How to do it in Linux </h2>
+<table border>
+<tr bgcolor=#FF0000><td>
+<h3> System Level </h3>
+</td></tr>
+<tr><td>
+<ol>
+<li> Adding system locale files for the given language
+  <ol>
+  <li> Character mapping
+  <li> Collation sequence
+  <li> Date time format and strings
+  <li> Money maters
+  <li> Translated messages of the applications
+  </ol>
+  Usualy the 
+  <ol>
+  <li> Source is in /usr/share/i18n/LL
+  <li> Binary is in /usr/share/locale/LL
+  </ol>
+<li> Creating requried console fonts
+<li> Adding locale files for X window system
+  <ol>
+  <li> Character encoding
+  <li> The font set that supplies the given glyphs
+  </ol>
+<li> Creating required GUI fonts (bdf-pcf, type1, ttf...)
+</ol>
+</td></tr>
+<tr bgcolor=#00FF00><td>
+<h3> Application Level </h3>
+</td></tr>
+<tr><td>
+<ol>
+<li> Use gettext to add internationalization in Linux apps
+  <ol>
+  <li> Intelligently identify the strings that require to be translated
+       within gettext() function
+  <li> Use special functions which adapt to the currently set locale
+  <li> Run xgettext on the files to generate the pot file
+  </ol>
+<li> Steps to do the translation.
+  <ol>
+  <li> POT files contain the strings that require to be translated
+       <ol>
+       <li> These files contain the string to be translated - identified by msgid "blah blah"
+       <li> and the space for the translated string - identified by msgstr ""
+       <li> Translate the string identified by msgid and place it infront of msgstr. 
+       </ol>
+  <li> Download and Install the TrueType font for your language, 
+       The font used should be the one specified in this website.
+  <li> In gfontkb or GEdit or Notepad or any editor which supports
+       selection of fonts, Have this font selected.
+  <li> Type in the translated string in your language into either 
+       gfontkb or GEdit or Notepad ..., depending on which ever you use. <br>
+       NOTE: You should be seeing what ever you enter in your language,
+       else, something is wrong. Please verify the above steps once
+       again.
+  <li> Have the POT file whose Message Strings you are translating 
+       opened in a text editor like vi or emacs. <br>
+       (if using emacs, be careful about the po mode, understand it 
+        properly if u use it).
+  <li> Cut and paste the translated string from gfontkb or GEdit or 
+       ... into the POT file opened in vi or emacs or any plain text 
+       editor of your choice.
+  <li> The translated string which you pasted into the POT file in
+       vi(or emacs or plain text editor of your choice) will appear
+       in english (or which ever language you use by default) with
+       maybe few strange characters in it. <br>
+       This is fine, because your editor is showing the string in
+       translated language as if its in english.
+  </ol>
+  If in doubt, you can always verify the info pages on gettext, available 
+  in your system. (bash$ info gettext)
+<li> Provide translated messages for the application for the given language
+  <ol>
+  <li> Run msgmerge to merge the new template with previous translated po file
+  <li> Run msgfmt to generate the binary mo file from the po file
+  <li> Install the mo file in respective locale directory <br>
+       /usr/share/locale/LL/LC_MESSAGES/application.mo
+  </ol>
+</ol>
+</td></tr>
+<tr bgcolor=#0000FF><td>
+<h3> User Level </h3>
+</td></tr>
+<tr><td>
+<ol>
+<li> Set the enviornment variable LANG to Language code (LL/LL_special)
+<li> Run the application, and viola there it is, the application in your 
+     language
+</ol>
+</td></tr>
+</table>
+
+<hr>
+Hey come back later for more and clearer ideas.
+
+</body>
+</html>
