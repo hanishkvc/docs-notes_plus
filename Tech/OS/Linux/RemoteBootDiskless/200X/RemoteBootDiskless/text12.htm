@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>the Details On DC : Net Loader</title>
+</head>
+<body text=#000000 bgcolor=#99CCFF link=#000080 vlink=#800000 alink=#000080>
+
+<center>
+<a href="text0.htm">First page</a> 
+<a href="text11.htm">Back</a> 
+<a href="text13.htm">Continue</a> 
+<a href="text22.htm">Last page</a> 
+<a href="remotebootdiskless.htm">Summary</a> 
+<a href="img12.htm">Graphic</a>
+</center><br>
+
+<h1><b><font color=#FFFFFF>the Details On DC : Net Loader</b></font></h1>
+
+<p>
+<ul>
+<li><h2>Network driver + BOOTP client + TFTP client</h2>
+<li><h2>provided by Etherboot or Netboot</h2>
+  <ul>
+  <li>in src-32 directory do make your_network_card.rom
+  <li>use the uncompress roms or compressed lzroms
+  </ul>
+<li><h2>Code which goes into EEPROM or Floppy</h2>
+<li><h2>Floppies mainly for checking things</h2>
+  <ul>
+  <li>make your_network_card.fdo (or)
+  <li>cat floppyload.bin network_card.lzrom &gt; /dev/fdo
+  <li>boot from this floppy to verify the things
+  </ul>
+</ul><br>
+</body>
+</html>

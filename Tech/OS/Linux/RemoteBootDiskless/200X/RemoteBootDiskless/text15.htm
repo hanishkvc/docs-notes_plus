@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>the Details DC related : Kernel image (3)</title>
+</head>
+<body text=#000000 bgcolor=#99CCFF link=#000080 vlink=#800000 alink=#000080>
+
+<center>
+<a href="text0.htm">First page</a> 
+<a href="text14.htm">Back</a> 
+<a href="text16.htm">Continue</a> 
+<a href="text22.htm">Last page</a> 
+<a href="remotebootdiskless.htm">Summary</a> 
+<a href="img15.htm">Graphic</a>
+</center><br>
+
+<h1><b><font color=#FFFFFF>the Details&#10;DC related : Kernel image (3)</b></font></h1>
+
+<p>
+<ul>
+<li><h2>Mknbi-linux examples</h2>
+  <ul>
+  <li>mknbi-linux 
+  --root-dir /tftpboot/%s 
+  --ip-addrs rom  
+  --append &quot;lance io=0x1000&quot; 
+  --kernel bzImage 
+  -o boot.diskless 
+
+  <li>mknbi-linux 
+  --root-dir ram
+  --ip-addrs rom 
+  --ramdisk-mode auto  
+  --ramdisk-image DisklessRamDisk.img 
+  --kernel bzImage  
+  --outfile boot.DisklessRamdisk
+  </ul>
+</ul><br>
+
+</body>
+</html>

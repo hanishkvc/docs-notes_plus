@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Sample /etc/dhcpd.conf</title>
+</head>
+<body text=#000000 bgcolor=#99CCFF link=#000080 vlink=#800000 alink=#000080>
+
+<center>
+<a href="text0.htm">First page</a> 
+<a href="text7.htm">Back</a> 
+<a href="text9.htm">Continue</a> 
+<a href="text22.htm">Last page</a> 
+<a href="remotebootdiskless.htm">Summary</a> 
+<a href="img8.htm">Graphic</a>
+</center><br>
+
+<h1><b><font color=#FFFFFF>Sample /etc/dhcpd.conf</b></font></h1>
+<p>
+<ul>
+allow unknown-clients; # exactly what ??? <br>
+allow bootp; <br>
+default-lease-time 1800; # 30 minutes <br>
+max-lease-time 7200; # 2 hours <br><br>
+subnet 192.168.1.0 netmask 255.255.255.0 { <br>
+    <ul>
+    # up to 126 Dynamic Clients <br>
+    range dynamic-bootp 192.168.1.129 192.168.1.254; <br>
+    # no effect the default file fetched <br>
+    # filename &quot;/tftpboot/boot.diskless&quot;; <br>
+    option domain-name-servers 192.168.1.1; <br>    
+    option broadcast-address 192.168.1.255; <br>    
+    option routers 192.168.1.1; <br>    
+    option domain-name &quot;xyz.org&quot;; <br>
+    </ul>
+} <br>
+# Host declaration for a Diskless client using bootp <br>
+host diskless1 { <br>
+    <ul>
+    hardware ethernet 00:50:56:d4:1b:d7; <br>
+    fixed-address 192.168.1.128; <br>    
+    # file to get <br>
+    filename &quot;/tftpboot/boot.diskless&quot;; <br>    
+    next-server 192.168.1.10; #the server from where to get the file <br>    
+    # option domain-name-servers 192.125.5.1; <br>    
+    # option domain-name &quot;abc.com&quot;; <br>
+    </ul>
+}
+</ul><br>
+
+</body>
+</html>
