@@ -1,0 +1,44 @@
+<HTML>
+
+<HEAD>
+<SCRIPT LANGUAGE="JavaScript">
+<!-- Begin
+
+sPageName='DistSysLinux'
+iStartPageNumber=0
+iEndPageNumber=14
+sPageExt='.html'
+
+iCur=iStartPageNumber-1
+
+function PrevPage() {
+  iCur--;
+  if(iCur <= iStartPageNumber)
+  {
+    iCur=iStartPageNumber;
+  }
+  this.parent.MainFrame.location.href = sPageName+iCur+sPageExt;
+}
+
+function NextPage() {
+  iCur++;
+  if(iCur >= iEndPageNumber)
+  {
+    iCur=iEndPageNumber;
+  }
+  this.parent.MainFrame.location.href = sPageName+iCur+sPageExt;
+//  this.parent.frames[0].location.href = sPageName+iCur+sPageExt;
+}
+// End -->
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<center>
+Distributed Systems and Linux (C) C Hanish Menon, 2000
+<a href="JavaScript:PrevPage()">Prev</a>
+<a href="JavaScript:NextPage()">Next</a>
+</center>
+</BODY>
+
+</HTML>

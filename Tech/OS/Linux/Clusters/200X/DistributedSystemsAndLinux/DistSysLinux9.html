@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE> Linux Virtual Server (LVS) </TITLE>
+</HEAD>
+ 
+<BODY BGcolor=#FFFFFF TEXT=#000000>
+<H1> Linux Virtual Server (LVS) </H1>
+ 
+<UL>
+<font size=+1>
+<LI> A linux kernel solution <BR>
+     Parallel services of cluster = Virtual service on Single IP <BR>
+  <UL>
+  <LI> Network address translation (IP Masq) <BR>
+       Request and Reply BOTH REWRITTEN - not easly scalable <BR>
+       Any OS with TCP/IP <BR>
+  
+  <LI> IP Tunneling (Encapsulate packet in New IP Packet 
+       destined for Real Server) <BR>
+       Request(small) rewritten, Reply(large usualy) DIRECT <BR>
+       Real Servers on any network <BR>
+       OS with IP-IP Tunneling, VirtualIP on NON ARP device <BR>
+  <LI> Direct routing (Update the packet with real server MAC) <BR>
+  </UL>
+<LI> Contains
+  <UL>
+  <LI> Controllers with ARP spoofing
+  <LI> System and Service Monitors 
+  </UL>
+<LI> Scheduling
+  <UL>
+  <LI> Round-robin & Weighted Round-robin <BR>
+       (Fast but imbalance for varying Request loads)
+  <LI> Least Connection & Weighted Least Connection.
+</font>  
+</UL>
+ 
+</BODY>
+</HTML>
+
