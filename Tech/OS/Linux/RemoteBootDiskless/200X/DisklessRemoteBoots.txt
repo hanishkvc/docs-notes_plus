@@ -1,0 +1,427 @@
+==============================
+A remote booting diskless m/c
+
+C Hanish Menon
+24 Feb 2000
+==============================
+
+Diskless m/cs are useful in many situations like
+  a) A distributed server enviornment 
+     where there may be certain jobs which require mostly processing
+     power and less or no permanent storage. Say things like 
+     seti@home, image processing applications etc.
+  b) Seting up lowcost networks
+  c) Centrally managed software is usefull
+  d) Network centric applications which have web based or some 
+     other thin clients which take care of UI and all the logic 
+     sits at the server.
+  e) there could be other situations like where the environment is 
+     bad for disks ,etc as given by etherboot intro.
+
+  As we know the disk on a PC is used to store the OS and the apps 
+required to be run on that m/c. Once we decide to go for a diskless 
+m/c We have to worry about how to load the kernel and the thin apps 
+required by them. We have two solutions to this
+
+  a) Burn it into an E/EEPROM.
+  b) Maintaining it on a server and download it over the network 
+     when booting
+  c) Or if one considers floppy disks as an alternative which can
+     be maintained on these m/cs then even this can be used.
+
+  We will be looking at the solution (b) i.e using a Remote booting
+setup for maintaining a diskless m/c(s) in a network based on tcp/ip.
+
+Lets see what and all are involved here
+
+  a) We require a SERVER which can store the OS and the apps with
+     their associated files. 
+     a.1) Provides some service which allows the Diskless client 
+          to dynamically get its IP and other associated info.
+          Like a BOOTP, RARP or DHCP server.
+     a.2) Provide a simple service which allows one to fetch
+          the kernel and related files from the server.
+          Like TFTP.
+     a.3) Provide some service which allows one to share files
+          over a network, which is used to provide access to
+          the Application files.
+          Like NFS.
+          
+  b) We have a CLIENT i.e the Diskless machine which as complementing
+     services compared to the Server.
+     b.1) Requires some storage which contains the network bootloading 
+          logic.
+          Usually EEPROM on Network device/Flash (Net loader BIOS 
+          extension) or even could be a floppy
+     b.2) Has logic which queries its identity from the network when 
+          Switched on or Reset.
+          Like the BOOTP or RARP client.
+     b.3) Logic to get the Kernel and related files from the server.
+          Like the TFTP client.
+     b.4) Logic to mount the filesystem over the network. This comes as
+          part of the Kernel and its related files.
+          Like the NFS client.
+        
+
+Packages required
+-----------------
+  The packages at the Server end like the BOOTP, TFTP and NFS servers are
+already bundled with most Linux systems. So next we have to look at the 
+packages required for seting up the client. This package as to mainly come
+with drivers for your clients network card and the corresponding BOOTP and
+TFTP clients. There are two packages out there which serve this they are
+
+  a) Netboot
+  b) Etherboot
+
+  They are mostly the same except for the network driver part. The Netboot 
+uses the packet drivers which come with almost any network card available 
+in the market. Thus Netboot can be used with almost any network card. But
+at the same time the use of packet drivers as its own disadvantages like
+One is required to give the Interrupt, Port and Memory address for these
+drivers so the NetBoot image produced using these can work only on very
+identicaly configured m/cs. Also these packet drivers are usually large
+requiring more EEPROM space or some associated logic. Where as the Etherboot
+uses custom drivers written specifically for etherboot thus at the positive
+side it as a smaller footprint and autoprobing capabilities where as the
+negative point is that its not available for all network cards.
+
+the Details
+-----------
+
+Server related setup
+--------------------
+
+  a) DHCP: Dynamic Host Configuration Protocol 
+     We will start with the 1st thing thats the DHCP server. Well 
+     I am using this instead of BOOTP as DHCP as the capabilities of 
+     BOOTP ++ (i.e plus more). This is the service which informs the 
+     Diskless Client (DC) about its IP address, the file to get and 
+     the network info in terms of the domain name, router ip, dns 
+     servers and so.
+
+     This service is configured using the dhcpd.conf file a sample of 
+     which is shown below.
+
+     Also normally this service is started by an entry in one of the
+     rc files. In RedHat linux one can use the setup program to specify
+     this in a straigth forward manner. ( /etc/rc.d/init.d/dhcpd )
+
+sample dhcpd.conf file:
+************************************************************
+   allow unknown-clients; # exactly what ???
+   allow bootp;
+   default-lease-time 1800;    # 30 minutes
+   max-lease-time 7200;      # 2 hours
+    
+   subnet 192.168.1.0 netmask 255.255.255.0 {
+     # up to 126 Dynamic Clients 
+     range dynamic-bootp 192.168.1.129 192.168.1.254;
+     # no effect the default file fetched
+     # filename "/tftpboot/boot.diskless"; 
+     option domain-name-servers 192.168.1.1;
+     option broadcast-address 192.168.1.255;
+     option routers 192.168.1.1;
+     option domain-name "xyz.org";
+   }
+   
+   # Host declaration for a Diskless client using bootp
+   host diskless1 {
+     hardware ethernet 00:50:56:d4:1b:d7;
+     fixed-address 192.168.1.128;
+     filename "/tftpboot/boot.diskless"; # file to get 
+     next-server 192.168.1.10; #the server from where to get the file
+     #    option domain-name-servers 192.125.5.1;
+     #    option domain-name "abc.com";
+   }                      
+************************************************************
+ 
+  b) TFTP: Trivial File Transfer Protocol
+     This is the service which allows the DC to fetch the specified
+     Boot file obtained using bootp (usually Kernel) from the server.
+
+     This is normally provided as a inetd daemon. So its enabled by
+     editing the inetd.conf file. Don't forget to send a SIGHUP to
+     the inet daemon after updating the inetd.conf file.
+
+     The directories to export using tftpd is specified as a list of 
+     directories as parameters to the tftpd server in inetd.conf. 
+     However if no directory is specified then /tftpboot is taken
+     as the default.
+
+     The Tagged Image file containing the Kernel should be placed in
+     this directory. The creation of this Kernel which can be net booted
+     will be explained further down in the document.
+
+
+Quote from tftpd man page.
+************************************************************
+The use of tftp(1) does not require an account or password on the remote
+system.  Due to the lack of authentication information, tftpd will allow
+only publicly readable files to be accessed.  Files may be written only
+if they already exist and are publicly writable.  Note that this extends
+the concept of ``public'' to include all users on all hosts that can be
+reached through the network; this may not be appropriate on all systems,
+and its implications should be considered before enabling tftp service.
+The server should have the user ID with the lowest possible privilege.     
+
+Access to files may be controlled by invoking tftpd with a list of direc­
+tories by including pathnames as server program arguments in
+/etc/inetd.conf. In this case access is restricted to files whose names
+are prefixed by the one of the given directories. If no directories are
+supplied the default is /tftpboot. To give out access to the whole
+filesystem, should this be desired for some reason, supply / as an argu­
+ment.                                                                      
+************************************************************
+
+from inetd.conf file
+************************************************************
+# Tftp service is provided primarily for booting.  Most sites
+# run this only on machines acting as "boot servers." Do not uncomment
+# this unless you *need* it.
+#
+tftp  dgram udp wait  root  /usr/sbin/tcpd  in.tftpd                            
+
+#    service name      - as in /etc/services
+#    socket type       - stream or dgram or raw or 
+#    protocol          - tcp or udp or 
+#    wait/nowait[.max] - single or multi threaded
+#    user[.group]      - run server as whom
+#    server program    - the server program 
+#    server program arguments - the aguments to server 
+************************************************************
+
+  c) NFS: Network FileSystem service
+     We use the NFS service to provide the DC with the root filesystem
+     from over a server on the network.
+     
+     This again is normally started as part of one of the rc scripts
+     which decides as to in which runlevels this service should be
+     run. ( /etc/rc.d/init.d/nfs ). In linux the main nfs logic is 
+     implemented as part of the kernel and the user level daemon just
+     initiates the required number of nfs kernel threads. 
+     
+     The files to export over NFS is configured in the /etc/exports
+     file. Here one specifies the directories to be exported, the list
+     of m/cs that are allowed access and the attributes for this access.
+     Once we have specified the values here we have to run exportfs to
+     get the currently exported filesystems syncronized with the new
+     /etc/exports file.
+     
+Sample /etc/exports file
+************************************************************
+/tftpboot/192.168.1.129 *(rw,no_root_squash)
+/usr                    *(ro,no_root_squash)
+/opt                    *(ro,no_root_squash)
+/var/lib                *(ro,no_root_squash)
+/home                   *(rw,no_root_squash) 
+************************************************************
+
+Sample /etc/exports from man page
+************************************************************
+  # sample /etc/exports file
+  /               master(rw) trusty(rw,no_root_squash)
+  /projects       proj*.local.domain(rw)
+  /usr            *.local.domain(ro) @trusted(rw)
+  /home/joe       pc001(rw,all_squash,anonuid=150,anongid=100)
+  /pub            (ro,insecure,all_squash)
+  /pub/private    (noaccess)
+************************************************************
+
+
+Diskless Client related setup
+-----------------------------
+
+  a) Net loader: (Network driver + BOOTP client + TFTP client)
+     The net loader part is taken care of for us by the EtherBoot 
+     or the NetBoot package. This is the code which goes into the 
+     EEPROM on the network card or could also go into the floppy.
+     
+     For getting this net loader 
+       1) unzip the EtherBoot package into a directory.
+       2) Change over to the src-32 directory 
+       3) run make YourNetworkCard.rom or just make
+     This will create the rom images (*.rom and *.lzrom the compressed 
+     form). You will have to burn it into the EEPROM for your network
+     card. 
+     
+     However if you are interested in checking it out as to everything
+     is proper or not before burning. Then you can create a floppy image
+     by placing a floppy in the floppy drive and running 
+     "make YourNetworkCard.fdo" or this is same as
+		 
+       cat floppyload.bin YourNetworkCard.lzrom > /dev/fd0
+     
+     Next you can boot from this floppy on the DC and verify as to 
+     whether it works or not.
+
+  b) Kernel image for DC: 
+     Next we require to create the kernel to be used for remote booting.
+     This involves 2 steps
+     1) Compiling the kernel: 
+        When Compiling the linux kernel see to it that the following options 
+        built into the kernel (i.e not a module). The options are
+        
+        Networking
+        [*] IP: kernel level autoconfiguration 
+            [ ]       BOOTP support (NEW) 
+            [ ]       RARP support (NEW)
+        BOOTP and RARP not required as Etherboot passes the IP info using 
+        commandline arguments.
+        
+        Network device support
+        Select the driver for your DC network card
+
+        Filesystems -> Network filesystems
+        <*> NFS filesystem support 
+            [*]    Root file system on NFS (NEW)   
+     
+     2) Creating the netbootimage (Tagged file) out of kernel:
+        The Net loaders produced by EtherBoot and NetBoot require a 
+        special kind of file called a tagged file so that one can
+        pass alot of content and info to it from the server. One of 
+        the contents in this tagged file is the kernel.
+
+        These packages come with a tool called mknbi-linux to create
+        this netbootimage out of the standard kernel file.
+
+        *************8888888888888888888888888888888**************
+        To compile the mknbi-linux program cd to the netboot-0.8.1
+        directory within the Etherboot directory.
+        **********************************************************
+        Patch the misc/romcheck/Makefile.in and update the
+        INCLUDE   = -I. -I$(INCDIR) 
+                    to 
+        INCLUDE   = -I. -I$(INCDIR) -I/usr/lib/bcc/include
+        or where ever the bcc's include files are available on your
+        system.
+        **********************************************************
+        Next do
+        ./configure
+        make
+        Now you will have the mknbi in [etherbootxxx/netboot-0.8.1/
+        mknbi-linux/] directory. Move this into /usr/local/bin or so
+        and rename it as mknbi-linux.
+        *************8888888888888888888888888888888**************
+        
+        Run the following command over the kernel image created for
+        the DC.
+        
+        mknbi-linux --root-dir /tftpboot/%s --ip-addrs rom 
+          --append "lance io=0x1000" --kernel bzImage -o boot.diskless 
+
+        **********************************************************
+                    or for a Ramdisk based solution
+        mknbi-linux --root-dir ram  --ip-addrs rom --ramdisk-mode auto 
+          --ramdisk-image DisklessRamDisk.img --kernel bzImage 
+          --outfile boot.DisklessRamdisk
+        **********************************************************
+
+        Next copy this file to the TFTP's directory (default is 
+        /tftpboot).
+
+
+  c) NFS Filesystem for DC (on the server)
+     As these DCs don't have their own harddisk we will be setting up their
+     root filesystem on the server so that they can access the various apps
+     that require to be run on them. This also allows any config files 
+     required by them or by the apps that run on them to be stored 
+     independent of the other DCs.
+     
+     Note: here I will be specifying /tftpboot/ip-addr everywhere to mean the
+     root directories of the individual DCs because in mknbi-linux example 
+     above I have assigned the root-dir option the value of /tftpboot/%s where
+     %s implies the IP address of that DC to the Net loader.
+     
+     
+     bin, lib, sbin and boot: 
+     Make copies of these directories at a location say /tftpboot/backup/ and 
+     then create hardlinks from the individual /tftpboot/ip-addr/ directories 
+     to these directories. So when DC mounts the root directory these are 
+     automatically available to them. This is important as these directories
+     contain the files required or used by the initscripts.
+     
+     usr, opt and home:  
+     These can be directly shared from the servers original copy. i.e basically
+     create empty directories under the individual /tftpboot/ip-addr/ 
+     directories and then mount the original server directories thro /etc/fstab
+     entries on the DC.
+     
+     dev, etc and var:
+     These require to be unique to each DC. However they can be initialy 
+     populated by making copies of the corresponding original server 
+     directories in the individual /tftpboot/ip-addr/ directories and then 
+     modifying them as required.
+
+     *******************8888888888888888888888888888888*********************
+              Files in /etc which require modification on DC
+              
+     [fstab] 
+       which loads most of the files over nfs.
+     [hosts]
+       contains the ip addr and hostname values as required.
+     [isapnp.conf]
+       use isadump on the diskless client to create the isapnp.conf 
+       file for the diskless client and edit it as required.
+     [rc.d/rc.sysinit]
+       NFS entries in fstab are loaded as early as possible.
+       Also their status is updated into the mtab file which inturn 
+       will be used by the unmount -a command in halt. For this one
+       as to add "mount -f -a -t nfs" line at the place where root(/) 
+       and proc are being added to mtab.
+          
+     [rc.d/init.d/netfs]
+       As code in rc.sysinit loads the nfs entries in fstab this shouldn't 
+       load the nfs entries once again in "start", instead have a seperate
+       "starta" if required to load all network filesystem entries in the
+       fstab.
+       Also the "stop" code shouldn't unload the nfs entries instead have a
+       "stopa" which unloads all the network filesystem entries. Unmounting
+       of nfs filesystems will be taken care by the unmount code in the
+       halt script of init.d 
+     [sysconfig/network]
+       contains HOSTNAME updated as required.
+     [sysconfig/network-scripts/ifcfg-eth0]
+       update the ip-addr to proper value for this Diskless client.
+
+     ALSO
+     Remove any unwanted files like say the Database server config and 
+     corresponding init and shutdown scripts.
+     Modify any other files if required to make them suite the Diskless 
+     client like say the XF86Config file or the conf.modules file or so.
+                                                                              
+     *******************8888888888888888888888888888888*********************
+     
+
+     proc, tmp, mnt and root: 
+     These also requrie to be unique to the individual DCs however they can be
+     empty so Create empty directories for these in the individual 
+     /tftpboot/ip-addr/ directories.
+
+     Add a fastboot file to the root of DC i.e the /tftpboot/ip-addr/ directory
+     so that the initscript doesn't trigger a filesystem check on the root
+     filesystem.
+
+    *************************************************************************
+                                  examples
+                                  
+    cp -a bin sbin lib boot dev etc var  /tftpboot/192.168.2.129
+    ln /tfptboot/192.168.2.129/lib/* /tftpboot/192.168.2.130/lib
+    
+    *************************************************************************
+    
+
+X-Terminal (from the Etherboot intro)
+----------
+
+  On Server: 
+  Have an entry for the DC in /etc/X11/xdm/Xaccess.
+  Comment out the :0 in /etc/X11/xdm/Xservers.
+  Run "xdm".
+
+  On Client:
+  run "X -query server-ip-or-name"
+
+
+  
+  
