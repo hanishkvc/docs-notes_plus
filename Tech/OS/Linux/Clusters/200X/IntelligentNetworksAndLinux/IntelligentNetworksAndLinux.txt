@@ -1,0 +1,105 @@
+====================================================
+Intelligent Networks and Linux
+Author: C Hanish Menon
+Date: April 2000
+Email: hanishkvc@hotmail.com
+Web: HanishKVC.tripod.com
+
+keywords: Intelligent networks, Linux, Clusters, 
+Loadsharing, Distributed computing, Redundancy, Failsafe,
+PVM, MPI, aglets, CORBA & DCOM, Java RMI, ARP Spoofing,
+...
+
+(c) C Hanish Menon, 2000
+====================================================
+
+Intelligent Networks
+--------------------
+a) Good Networks of computers
+b) Good networked Computers
+
+A collection | cluster of computers which can take care of changing network structures, Failures, Loadsharing, Distributed computing power, ...  
+
+Or shall we say High Performance, High Availability & Effective utilization of
+available resources.
+
+Where do we need them
+---------------------
+
+a) High activity sites on the net
+b) Critical servers in an Intranet or Business setup 
+c) Processing intensive problems
+d) Local Area Network
+...
+
+Quote from LVS guys "Clusters of servers, connected by a fast network, are emerging as a viable architecture for building a high-performance and highly available server. This type of loosely coupled architecture is more scalable, more cost-effective and more reliable than a single processor system or a tightly coupled multiprocessor system."
+
+How Linux fits
+--------------
+
+a) Open nature of code in Linux & its easy availability
+b) Availability of different networking protocol stacks 
+c) Support for wide variety of Hardware
+d) Simplicity in adding support for new Hardware or Systems
+
+The future demands it
+---------------------
+
+a) Humans are social beings, we like to interact
+b) DeCentralization helps
+c) Future computing requirements & Economics
+
+Current status
+--------------
+
+a) Layered architecture
+b) Adoptation of a open and good protocol as standard
+c) Support packages for Distributed systems
+
+Say things like TCP - UDP, IP, DNS, DHCP, RPC, Corba - DCom, PVM - MPI, MOSIX, ...
+
+Things in progress or yet to do
+-------------------------------
+
+a) Intelligent Component architecture
+b) Intelligent DNS - DHCP communication
+c) Cross platform Distributed computing architecture
+d) Virtual servers or better still Virtual systems
+e) Endpoint identity, Transaction identity, Privacy or Security
+
+Implementation Issues
+---------------------
+
+From Applications point of view
+
+a) Passive setups
+   No change required for applications, But 
+   the Network and the systems take care of it.
+b) Active setups
+   Applications require to actively utilize 
+   the resources available in the network.
+   
+Passive setups
+--------------
+
+a) From network angle
+   ARP spoofing => IP takeover
+   Pulse or Heartbeat => Sense failure of service
+   Controller => Distribute load & Assure Failsafe
+   NFS => Availability of critical data across m/cs
+       => Distribution of critical data (& load balancing) across m/cs
+   DNS - DHCP => Managing a  dynamic network
+   LVS => A linux kernel solution
+b) From system point
+   Mosix, Raid, Multiple network cards, 
+
+Active setups
+-------------
+
+a) Packages for Interaction of systems over a network 
+   Sockets, RPC, PVM, MPI, Corba - DCom
+b) Managing a Dynamic system
+   Aglets++, PVM, Mosix, 
+
+   
+   
