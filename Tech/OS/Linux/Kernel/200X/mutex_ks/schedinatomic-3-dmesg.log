@@ -1,0 +1,340 @@
+or pci:0000:00:07.0
+PM: Adding info for pci:0000:00:07.1
+PM: Adding info for pci:0000:00:07.2
+PM: Adding info for pci:0000:00:07.3
+PM: Adding info for pci:0000:00:07.4
+PM: Adding info for pci:0000:00:07.5
+PM: Adding info for pci:0000:00:0d.0
+PM: Adding info for pci:0000:00:14.0
+PM: Adding info for pci:0000:01:00.0
+PCI: Using IRQ router VIA [1106/0686] at 0000:00:07.0
+spurious 8259A interrupt: IRQ7.
+pty: 256 Unix98 ptys configured
+VFS: Disk quotas dquot_6.5.1
+Journalled Block Device driver loaded
+devfs: v1.22 (20021013) Richard Gooch (rgooch@atnf.csiro.au)
+devfs: boot_options: 0x0
+Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+PCI: Disabling Via external APIC routing
+PM: Adding info for No Bus:pnp1
+isapnp: Scanning for PnP cards...
+isapnp: No Plug & Play device found
+Using anticipatory scheduling elevator
+Floppy drive(s): fd0 is 1.44M
+FDC 0 is a post-1991 82077
+PM: Adding info for platform:floppy0
+Uniform Multi-Platform E-IDE driver Revision: 7.00alpha2
+ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+hda: SAMSUNG SV2044D, ATA DISK drive
+PM: Adding info for No Bus:ide0
+hdb: SAMSUNG SV4084H, ATA DISK drive
+hdc: ASUS CRW-4012A, ATAPI CD/DVD-ROM drive
+PM: Adding info for No Bus:ide1
+hdd: SAMSUNG COMBO SM-304B, ATAPI CD/DVD-ROM drive
+ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+PM: Adding info for ide:0.0
+PM: Adding info for ide:0.1
+ide1 at 0x170-0x177,0x376 on irq 15
+PM: Adding info for ide:1.0
+PM: Adding info for ide:1.1
+hda: max request size: 128KiB
+hda: 39862368 sectors (20409 MB) w/472KiB Cache, CHS=39546/16/63
+ /dev/ide/host0/bus0/target0/lun0: p1 p2 p3 p4 < p5 p6 p7 >
+hdb: max request size: 128KiB
+hdb: 79730784 sectors (40822 MB) w/426KiB Cache, CHS=65535/16/63
+ /dev/ide/host0/bus0/target1/lun0: p1 p2 p3 p4 < p5 p6 p7 p8 >
+mice: PS/2 mouse device common for all mice
+input: PS/2 Logitech Mouse on isa0060/serio1
+serio: i8042 AUX port at 0x60,0x64 irq 12
+input: AT Set 2 keyboard on isa0060/serio0
+serio: i8042 KBD port at 0x60,0x64 irq 1
+PM: Adding info for platform:eisa0
+EISA: Probing bus 0 at eisa0
+PM: Removing info for platform:eisa0
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP: routing cache hash table of 2048 buckets, 16Kbytes
+TCP: Hash tables configured (established 16384 bind 16384)
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+kjournald starting.  Commit interval 5 seconds
+EXT3-fs: mounted filesystem with ordered data mode.
+VFS: Mounted root (ext3 filesystem) readonly.
+Freeing unused kernel memory: 212k freed
+Adding 265032k swap on /dev/hdb5.  Priority:-1 extents:1
+EXT3 FS on hdb7, internal journal
+Real Time Clock Driver v1.11a
+NTFS driver 2.1.4 [Flags: R/O MODULE].
+SCSI subsystem initialized
+PM: Adding info for No Bus:ide-scsi
+scsi0 : SCSI host adapter emulation for IDE ATAPI devices
+PM: Adding info for No Bus:host0
+  Vendor: ASUS      Model: CRW-4012A         Rev: 1.0 
+  Type:   CD-ROM                             ANSI SCSI revision: 02
+PM: Adding info for scsi:0:0:0:0
+scsi1 : SCSI host adapter emulation for IDE ATAPI devices
+PM: Adding info for No Bus:host1
+ide-scsi: abort called for 4
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000006 [<c01de8fd>] vt_console_print+0x2ad/0x2c0
++00000004 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20 
+>> corresponds to the function pointer initialized as part of the waitqueue
+prepared by __down in its stack - HKVC <<
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod] 
+>> the above corresponds to the function pointer initialized in the stack of 
+scsi_sleep called by idescsi_abort, wrt the timer logic it is initializing. 
+Also what happed to scsi_sleep, the address pointed to by idescsi_abort is 
+scsi_sleep - I have verified in module binary file (ksymoops or ???)- HKVC <<
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+ide-scsi: abort called for 5
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000006 [<c01de8fd>] vt_console_print+0x2ad/0x2c0
++00000004 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+ide-scsi: abort called for 6
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000006 [<c01de8fd>] vt_console_print+0x2ad/0x2c0
++00000004 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+bad: scheduling while atomic!
+Call Trace:
++00000002 [<c0116fac>] schedule+0x3c/0x380
++00000005 [<c01173fe>] __wake_up_locked+0xe/0x20
++00000005 [<c0107df9>] __down+0x89/0x100
++00000006 [<c0117340>] default_wake_function+0x0/0x20
++00000003 [<c0107fef>] __down_failed+0xb/0x14
++00000004 [<d08566ba>] .text.lock.scsi_error+0x37/0x4d [scsi_mod]
++00000009 [<d0855c90>] scsi_sleep_done+0x0/0x20 [scsi_mod]
++00000013 [<d084655e>] idescsi_abort+0x7e/0xf0 [ide_scsi]
++00000007 [<d0855512>] scsi_try_to_abort_cmd+0x52/0x80 [scsi_mod]
++00000005 [<d085566b>] scsi_eh_abort_cmds+0x5b/0xe0 [scsi_mod]
++00000006 [<d08562b4>] scsi_unjam_host+0x1a4/0x1d0 [scsi_mod]
++00000020 [<d085643a>] scsi_error_handler+0x15a/0x1c0 [scsi_mod]
++00000001 [<d08562e0>] scsi_error_handler+0x0/0x1c0 [scsi_mod]
++00000015 [<c01071b1>] kernel_thread_helper+0x5/0x14
++00000003 
+scsi scan: 55 byte inquiry failed with code 134217730.  Consider BLIST_INQUIRY_36 for this device
+  Vendor: SAMSUNG   Model: COMBO SM-304B     Rev: BS04
+  Type:   CD-ROM                             ANSI SCSI revision: 02
+PM: Adding info for scsi:1:0:0:0
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on hda3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on hdb3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+NTFS volume version 3.1.
+drivers/usb/core/usb.c: registered new driver usbfs
+drivers/usb/core/usb.c: registered new driver hub
+ehci_hcd: block sizes: qh 128 qtd 96 itd 128 sitd 64
+ohci-hcd: 2003 Feb 24 USB 1.1 'Open' Host Controller (OHCI) Driver (PCI)
+ohci-hcd: block sizes: ed 64 td 64
+drivers/usb/host/uhci-hcd.c: USB Universal Host Controller Interface driver v2.1
+PCI: Found IRQ 11 for device 0000:00:07.2
+PCI: Sharing IRQ 11 with 0000:00:07.3
+PCI: Sharing IRQ 11 with 0000:00:14.0
+uhci-hcd 0000:00:07.2: UHCI Host Controller
+uhci-hcd 0000:00:07.2: irq 11, io base 0000d400
+uhci-hcd 0000:00:07.2: new USB bus registered, assigned bus number 1
+drivers/usb/host/uhci-hcd.c: detected 2 ports
+uhci-hcd 0000:00:07.2: root hub device address 1
+usb usb1: new device strings: Mfr=3, Product=2, SerialNumber=1
+drivers/usb/core/message.c: USB device number 1 default language ID 0x409
+usb usb1: Product: UHCI Host Controller
+usb usb1: Manufacturer: Linux 2.6.0-test4 uhci-hcd
+usb usb1: SerialNumber: 0000:00:07.2
+drivers/usb/core/usb.c: usb_hotplug
+PM: Adding info for usb:usb1
+usb usb1: usb_new_device - registering interface 1-0:0
+drivers/usb/core/usb.c: usb_hotplug
+hub 1-0:0: usb_probe_interface
+hub 1-0:0: usb_probe_interface - got id
+hub 1-0:0: USB hub found
+hub 1-0:0: 2 ports detected
+hub 1-0:0: standalone hub
+hub 1-0:0: ganged power switching
+hub 1-0:0: global over-current protection
+hub 1-0:0: Port indicators are not supported
+hub 1-0:0: power on to power good time: 2ms
+hub 1-0:0: hub controller current requirement: 0mA
+hub 1-0:0: local power source is good
+hub 1-0:0: no over-current condition exists
+hub 1-0:0: enabling power on all ports
+PM: Adding info for usb:1-0:0
+PCI: Found IRQ 11 for device 0000:00:07.3
+PCI: Sharing IRQ 11 with 0000:00:07.2
+PCI: Sharing IRQ 11 with 0000:00:14.0
+uhci-hcd 0000:00:07.3: UHCI Host Controller
+uhci-hcd 0000:00:07.3: irq 11, io base 0000d800
+uhci-hcd 0000:00:07.3: new USB bus registered, assigned bus number 2
+drivers/usb/host/uhci-hcd.c: detected 2 ports
+uhci-hcd 0000:00:07.3: root hub device address 1
+usb usb2: new device strings: Mfr=3, Product=2, SerialNumber=1
+drivers/usb/core/message.c: USB device number 1 default language ID 0x409
+usb usb2: Product: UHCI Host Controller
+usb usb2: Manufacturer: Linux 2.6.0-test4 uhci-hcd
+usb usb2: SerialNumber: 0000:00:07.3
+drivers/usb/core/usb.c: usb_hotplug
+PM: Adding info for usb:usb2
+usb usb2: usb_new_device - registering interface 2-0:0
+drivers/usb/core/usb.c: usb_hotplug
+hub 2-0:0: usb_probe_interface
+hub 2-0:0: usb_probe_interface - got id
+hub 2-0:0: USB hub found
+hub 2-0:0: 2 ports detected
+hub 2-0:0: standalone hub
+hub 2-0:0: ganged power switching
+hub 2-0:0: global over-current protection
+hub 2-0:0: Port indicators are not supported
+hub 2-0:0: power on to power good time: 2ms
+hub 2-0:0: hub controller current requirement: 0mA
+hub 2-0:0: local power source is good
+hub 2-0:0: no over-current condition exists
+hub 2-0:0: enabling power on all ports
+PM: Adding info for usb:2-0:0
+hub 1-0:0: port 1, status 100, change 3, 12 Mb/s
+hub 1-0:0: port 2, status 100, change 3, 12 Mb/s
+hub 2-0:0: port 1, status 100, change 3, 12 Mb/s
+hub 2-0:0: port 2, status 100, change 3, 12 Mb/s
+hub 1-0:0: port 1 enable change, status 100
+hub 1-0:0: port 2 enable change, status 100
+hub 2-0:0: port 1 enable change, status 100
+hub 2-0:0: port 2 enable change, status 100
+drivers/usb/host/uhci-hcd.c: d400: suspend_hc
+drivers/usb/host/uhci-hcd.c: d800: suspend_hc
+ip_tables: (C) 2000-2002 Netfilter core team
+ip_conntrack version 2.1 (2047 buckets, 16376 max) - 304 bytes per conntrack
+PCI: Found IRQ 5 for device 0000:00:07.5
+PCI: Setting latency timer of device 0000:00:07.5 to 64
+apm: BIOS version 1.2 Flags 0x07 (Driver version 1.16ac)
+pnp: the driver 'parport_pc' has been registered
+pnp: match found with the PnP device '00:0f' and the driver 'parport_pc'
+parport0: PC-style at 0x378 [PCSPP,EPP]
+parport0: cpp_daisy: aa5500ff(38)
+parport0: assign_addrs: aa5500ff(38)
+parport0: cpp_daisy: aa5500ff(38)
+parport0: assign_addrs: aa5500ff(38)
+parport_pc: Via 686A parallel port: io=0x378
+lp0: using parport0 (polling).
+ntop uses obsolete (PF_INET,SOCK_PACKET)

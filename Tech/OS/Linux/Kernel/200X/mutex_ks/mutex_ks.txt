@@ -1,0 +1,238 @@
+True Mutual exclusion in Kernel space under Linux
+(Mutual Exclusion, 
+  the poor guy in uniprocessor machines under linux kernel 2.6.0)
+C Hanish Menon (HanishKVC.com)
+26 aug 2003 - 1737
+---------------------------------------------------
+---------------------------------------------------
+
+######## Contents ########
+
+* Abstract
+* Details
+  * Exclusive Execution
+  * Mutual Exclusion
+  * In Linux
+* the Proposal
+  * the Permanent solution (a true mutex in the kernel space)
+  * the Temporary solution (a global flag in UniProcessor mode)
+* Moving existing code to use mutexks
+* Comments at the begining of kernel/mutexks.c
+
+######## Abstract ########
+
+Linux kernel implements spinlocks to provide mutual exclusion, which works
+in both SMP and UniProcessor configurations. However the spinlock logic is
+implemented such that in a UniProcessor configuration it acts more as a 
+Exclusive Execution logic rather than Mutual Exclusion logic.
+
+This paper talks about this Exclusive Execution and Mutual Exclusion. And
+also it talks about how to implement a mutual exclusion logic in linux 
+in the kernel space which works irrespective of whether we are in SMP or 
+Uniprocessor mode using the existing primitives in the kernel.
+
+
+######## Details ########
+
+A OS requires to provide 2 kind of execution protection logic to tasks in a 
+multitasking system.
+  a) Exclusive Execution and 
+  b) Mutual Exclusion.
+
+a) Exclusive Execution
+----------------------
+
+Here a given piece of code wants to run uninterrupted by any other logic be 
+it another thread or interrupt or anything else i.e exclusively in the system.
+This could be because while interacting with a device or another entity it 
+has to maintain some strict timing or doesn't want any possible sideeffects 
+from other code. The code within such Exclusive Execution zone would be extra
+careful about what it calls or uses.
+
+In a SMP machine the Exclusive execution could be on one of the CPUs or in 
+the full SMP system itself (During some critical management handshake, have
+n't worked on SMP machines so guessing).
+
+
+b) Mutual Exclusion
+-------------------
+
+Here a given piece of code runs exclusively within the specified zone with
+respect to either another context of the same code or a different code which
+shares something in common with the current logic. However note that here
+the code doesn't want exclusive access to the system, it wants exclusion 
+wrt some other predefined codes only.
+
+
+In Linux
+---------
+
+Spinlocks in Linux provide both Mutual Exclusion and Exclusive Execution (if
+required) in a SMP configuration. Even thou Spinlocks are not a TRUE Exclusive 
+Execution logic in a SMP configuration, the exclusivity it can provides in the 
+current CPU where the code is executing is sufficient for most work.
+
+>>> QUERY/POLL: Does anyone have a need where even thou Mutual Exclusion is 
+all thats required, but to simplify certain things the code may want local 
+Excluvie Execution (spin_lock_irqsave). <<<
+
+However in the case of UniProcessor machines under Linux, we find that the
+spinlocks gets replaced by a logic which provides Exclusive Execution 
+rather than Mutual Exclusion. ( Note: depending on whether it is spin_lock 
+or spin_lock_irq[save] - either we have Exclusive Execution except for 
+interrupts or Full Exclusive Execusion in the UniProcessor system)
+
+This behaviour will cause code which require mutual exclusion to not work
+properly in uniprocessor machines. A typical code which requires this 
+behaviour could be
+
+a) A code want's the data that its working on to be protected from others
+   modifying it. But 
+   
+   a.1) it doesn't mind sharing the CPU with other code running on the 
+   system as long as the other code doesn't mess with its data or 
+
+   a.2) it could want services of interrupts (especial timer interrupt 
+   for things like waiting or timeout) or other tasks in some 
+   circumstances.
+
+   Example from linux 2.6.0-test4 which shows this requirement:
+
+   Example 1 - scsi_error.c
+   ------------------------
+
+   spin_lock_irqsave(scmd->device->host->host_lock, flags);
+   rtn = scmd->device->host->hostt->eh_abort_handler(scmd);
+   spin_unlock_irqrestore(scmd->device->host->host_lock, flags);
+
+   Example 2 - scsi_error.c
+   ------------------------
+   
+   spin_lock_irqsave(scmd->device->host->host_lock, flags);
+   rtn = scmd->device->host->hostt->eh_device_reset_handler(scmd);
+   spin_unlock_irqrestore(scmd->device->host->host_lock, flags);
+
+   Inturn the handlers called trigger timers and schedule_timeout,
+   which cann't be called as spin_lock_irqsave as disabled both
+   interrupts and preemption.
+
+   Note that in the above two cases replacing the spin_lock_irqsave
+   with spin_lock won't provide mutual exclusion as preemption is
+   disabled (However in 2.6.0 (till -test4) because the scheduler 
+   doesn't strictly enforce preempt_disable, but rather just dump a 
+   stack trace and continue, it can work).
+
+   
+					
+######## the Proposal ########
+
+The Permanent Solution
+----------------------
+
+We add a True Mutual Exclusion (ME) primitive mutexks_t into linux. So code 
+which require mutual exclusion rather than Exclusive Execution can get it, 
+with the optimal code for both SMP and UniProcessor machines.
+
+This ME primitive mutexks_t would use 
+  a) Spinlock for SMP
+  b) Semaphore logic for UniProcessor machines
+
+i.e provide a proper ME logic which behaves as required in both SMP and Uni
+Processor machines.
+
+Note: In SMP spin_lock allows a logic to run on one processor with interrupts 
+and preemption still working on that CPU, at the same time if some other code 
+on some other CPU wants to aquire the same lock, that logic will be put to 
+hold while still allowing other code to run on that some other CPU.
+
+The Temporary Solution
+----------------------
+
+The temporary solution consists of a global mutualExclusionOnly flag.
+So when we use a spinlock and want only the mutualExclusion logic, 
+We set this flag using mutualexclusion(MEONLY_ENABLE). Then the schedular
+will allow scheduling even if preempt count is not zero. This logic is
+only enabled for the UniProcessor mode, as in SMP case the availability
+of multiple CPUs in the system avoids this deadlock to a larger extent.
+
+(Note: currently the schedular always ignores preempt count if it gets 
+called, but this is not the right thing. Here we are fixing this bug
+(or possibly temporary flexiblity given by the schedular developer) by 
+making the scheduler abide by the preempt count in the normal case and 
+make the scheduler ignore the preempt count only if the mutualExclusionOnly
+flag is set and thus we get the desired behaviour to some extent.)
+
+However in the long run one should use a true mutual exclusion logic. One
+possible implementation of this true mutual exclusion logic using whats 
+already available in the kernel is given as the permanent solution above.
+
+
+######## Moving existing code to use mutexks ########
+
+Any code that is using semaphore logic or spinlock logic, and you want it to
+provide proper mutual execlusion logic in both SMP and UniProcessor configs,
+can be moved to use mutexks by
+
+a) update the declaration of synchronization object
+
+  struct semaphore => mutexks_t
+  spinlock_t       => mutexks_t
+
+b) Use the primitives provided by mutexks to initialize as well as to work 
+   on them.
+
+   mutexks_t myMutex = MUTEXKS_UNLOCKED(myMutex);
+   mutexks_t myLockedMutex = MUTEXKS_LOCKED(myMutex);
+   ...
+   mutexks_lock(&myMutex);
+   mutualy excluded code ...
+   mutexks_unlock(&myMutex);
+
+Note that it can put the calling context in a wait queue or block it 
+if required.
+
+
+######## Comments at the begining of kernel/mutexks.c ########
+
+/*
+ * kernel/mutexks.c - True Mutual Exclusion in Kernel space
+ * Logic which provides true Mutual Exclusion in both
+ * SMP and UniProcessor machines in the Kernel space
+ *
+ * 26 august 2003, C Hanish Menon (hanishkvc.com)
+ *
+ * Note that it can put the calling context in a wait queue 
+ * or block it if required
+ *
+ * How:
+ * Use spin_lock on SMP
+ * Use semaphore on UniProcessor machines
+ *
+ * Why required:
+ * Because the current spin_lock logics lead to Exclusive Execution
+ * rather than Mutual Exclusion in UniProcessor machines
+ *
+ * Look at www.hanishkvc.com/work/outside/kernel/mutex_ks/index.html
+ *
+ * To help during transition currently both the 
+ * temporary (CONFIG_MUTEX_KS_SIMPLE) and 
+ * permanent (CONFIG_MUTEX_KS) solutions mentioned in the paper 
+ * are provided.
+ *
+ */
+
+/* Old comments - 26 aug 2003
+ *
+ * Linux has to understand the difference between
+ * a) Mutual Exclusion <I mean => no one else should be allowed
+ *    to mess with a given part while someone is already in it> and
+ *    Exclusive Execution <I mean => a section of code which shouldn't
+ *    be interrupted by anything else>
+ * b) The need for implementing spinlocks, used with the idea of
+ *    Mutual exclusion mentioned above, as semaphore logic rather
+ *    than a spinlock logic which disables interrupts/preemption
+ *    locally (the current implementation in linux - 2.6.0).
+ */
+	  
+	
+

@@ -1,0 +1,70 @@
+<html>
+<head>
+<title> mutexks - true mutual exclusion in kernel space in linux </title>
+</head>
+
+<body>
+<h1> mutexks - true mutual exclusion in kernel space in linux </h1>
+<hr>
+quick links <br>
+<a href="mutex_ks.txt"> the simple paper on mutexks </a> <br>
+<a href="linux-2.6.0-test4-hkvc-26aug2003-1734.patch"> the kernel patch </a>
+<br>
+<ol>This patch contains:
+  <li>slight addition to show_trace in traps.c so that it prints 
+      the distance between the functions in the stack interms of
+      words.
+  <li>addition of mutexks.c and mutexks.h files which provide the
+      mutexks logic
+  <li>a small patch to sched.c so that it doesn't ignore the preempt_count
+      unless the mutualExclusionOnlyFlag is set. <this again is a temporary
+      fix till people requiring mutual exclusion move to using mutexks
+      or similar logic.
+  <li>a hack or BAD FIX to scsi_error.c so that the current problem in it is
+      solved TEMPORARILY. The actual fix would involve moving the code to 
+      use mutexks or similar where ever required.
+</ol>
+      
+<hr>
+The story ;-) <br>
+The way linux implements spinlocks in UniProcessor configuration, the semantic
+of spinlocks changes from a mechanism which provides Mutual Exclusion (ME) to 
+one which provides Exclusive Execution (EE). So I have wondered wouldn't it 
+affect code which expects ME. But in 2.4 I didn't find any issue related to
+this on my machine. However with the latest 2.6.0 kernel I had some surprises.
+<p>
+When I tried 2.6.0 kernel I found that when querying my ide cdrom drives, for
+one of the drives in test3 it used to dump few stack traces and later crash. 
+However with test4 it dumps few stack traces <br>
+<p>
+<a href="schedinatomic-3-dmesg.log"> trace 1 - captured using dmesg </a>. I 
+have identified the contents of the call trace dumped in the log file, which 
+correspond to function pointers in the stack of other functions. <br>
+<a href="schedinatomic-4-dmesg.log"> trace 2 - captured using dmesg (has one part of my fix) </a> <br>
+and then continues with its job. 
+
+<p>
+So one analysing the call trace from test4 with the source and binary code, I 
+realized that the reason this is happening is because of the spinlock no longer
+being a ME logic but having become a EE logic in uniprocessor configurations. 
+
+<p>
+So I have come up with a solution to this problem by implementing what
+<a href="mutex_ks.txt"> I call MUTEXKS </a> for mutual exclusion in 
+kernelspace. Which is nothing but integration of existing spinlock and 
+semaphore logics in the kernel into a single entity which behaves like a 
+spinlock in SMP configurations and a semaphore in UniProcessor configurations. 
+<br>
+You can read about it in the link provided above.<br>
+<p>
+Here is a <a href="tempfix-schedinatomic-5-dmesg.log"> dmesg log after my fix </a> (this is a temporary hack, as the proper implementation will involve 
+changing to many locations in the scsci layer to use mutexks where appropriate
+rather than spinlocks, and its better left to the people who maintain it, as
+they know the flow there better).
+
+<hr>
+Last updated on 26 aug 2003 - 1800, India <br>
+Created using Vim :-)
+
+</body>
+</html>

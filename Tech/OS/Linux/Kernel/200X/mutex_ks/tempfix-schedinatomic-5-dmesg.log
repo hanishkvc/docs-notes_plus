@@ -1,0 +1,283 @@
+Linux version 2.6.0-test4 (hanishkvc@debian-hanishkvc) (gcc version 2.95.4 20011002 (Debian prerelease)) #13 Tue Aug 26 01:26:13 IST 2003
+Video mode to be used for restore is f00
+BIOS-provided physical RAM map:
+ BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+ BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+ BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved)
+ BIOS-e820: 0000000000100000 - 000000000fff0000 (usable)
+ BIOS-e820: 000000000fff0000 - 000000000fff3000 (ACPI NVS)
+ BIOS-e820: 000000000fff3000 - 0000000010000000 (ACPI data)
+ BIOS-e820: 00000000ffff0000 - 0000000100000000 (reserved)
+255MB LOWMEM available.
+On node 0 totalpages: 65520
+  DMA zone: 4096 pages, LIFO batch:1
+  Normal zone: 61424 pages, LIFO batch:14
+  HighMem zone: 0 pages, LIFO batch:1
+DMI 2.2 present.
+ACPI disabled because your bios is from 2000 and too old
+You can enable it with acpi=force
+ACPI: RSDP (v000 VIA694                                    ) @ 0x000f69d0
+ACPI: RSDT (v001 VIA694 AWRDACPI 0x42302e31 AWRD 0x00000000) @ 0x0fff3000
+ACPI: FADT (v001 VIA694 AWRDACPI 0x42302e31 AWRD 0x00000000) @ 0x0fff3040
+ACPI: DSDT (v001 VIA694 AWRDACPI 0x00001000 MSFT 0x0100000c) @ 0x00000000
+ACPI: MADT not present
+Building zonelist for node : 0
+Kernel command line: ro root=/dev/hdb7
+Local APIC disabled by BIOS -- reenabling.
+Found and enabled local APIC!
+Initializing CPU#0
+PID hash table entries: 1024 (order 10: 8192 bytes)
+Detected 600.050 MHz processor.
+Console: colour VGA+ 80x25
+Calibrating delay loop... 1175.55 BogoMIPS
+Memory: 256164k/262080k available (1466k kernel code, 5188k reserved, 755k data, 212k init, 0k highmem)
+Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
+-> /dev
+-> /dev/console
+-> /root
+CPU:     After generic identify, caps: 0183fbff c1c7fbff 00000000 00000000
+CPU:     After vendor identify, caps: 0183fbff c1c7fbff 00000000 00000000
+CPU: L1 I Cache: 64K (64 bytes/line), D cache 64K (64 bytes/line)
+CPU: L2 Cache: 64K (64 bytes/line)
+CPU:     After all inits, caps: 0183fbff c1c7fbff 00000000 00000020
+Intel machine check architecture supported.
+Intel machine check reporting enabled on CPU#0.
+CPU: AMD Duron(tm) Processor stepping 00
+Enabling fast FPU save and restore... done.
+Checking 'hlt' instruction... OK.
+POSIX conformance testing by UNIFIX
+enabled ExtINT on CPU#0
+ESR value before enabling vector: 00000000
+ESR value after enabling vector: 00000000
+Using local APIC timer interrupts.
+calibrating APIC timer ...
+..... CPU clock speed is 599.0647 MHz.
+..... host bus clock speed is 199.0882 MHz.
+PM: Adding info for No Bus:legacy
+Initializing RT netlink socket
+EISA bus registered
+PCI: PCI BIOS revision 2.10 entry at 0xfb340, last bus=1
+PCI: Using configuration type 1
+mtrr: v2.0 (20020519)
+BIO: pool of 256 setup, 14Kb (56 bytes/bio)
+biovec pool[0]:   1 bvecs: 256 entries (12 bytes)
+biovec pool[1]:   4 bvecs: 256 entries (48 bytes)
+biovec pool[2]:  16 bvecs: 256 entries (192 bytes)
+biovec pool[3]:  64 bvecs: 256 entries (768 bytes)
+biovec pool[4]: 128 bvecs: 256 entries (1536 bytes)
+biovec pool[5]: 256 bvecs: 256 entries (3072 bytes)
+Linux Plug and Play Support v0.97 (c) Adam Belay
+pnp: the driver 'system' has been registered
+PnPBIOS: Scanning system for PnP BIOS support...
+PnPBIOS: Found PnP BIOS installation structure at 0xc00fbe10
+PnPBIOS: PnP BIOS version 1.0, entry 0xf0000:0xbe40, dseg 0xf0000
+PM: Adding info for No Bus:pnp0
+PM: Adding info for pnp:00:00
+PM: Adding info for pnp:00:01
+PM: Adding info for pnp:00:02
+PM: Adding info for pnp:00:03
+PM: Adding info for pnp:00:04
+PM: Adding info for pnp:00:05
+PM: Adding info for pnp:00:06
+pnp: match found with the PnP device '00:07' and the driver 'system'
+PM: Adding info for pnp:00:07
+pnp: match found with the PnP device '00:08' and the driver 'system'
+PM: Adding info for pnp:00:08
+PM: Adding info for pnp:00:09
+PM: Adding info for pnp:00:0a
+PM: Adding info for pnp:00:0c
+PM: Adding info for pnp:00:0d
+PM: Adding info for pnp:00:0e
+PM: Adding info for pnp:00:0f
+PnPBIOS: 15 nodes reported by PnP BIOS; 15 recorded by driver
+PCI: Probing PCI hardware
+PCI: Probing PCI hardware (bus 00)
+PM: Adding info for No Bus:pci0000:00
+Disabling VIA memory write queue (PCI ID 0305, rev 02): [55] 89 & 1f -> 09
+PM: Adding info for pci:0000:00:00.0
+PM: Adding info for pci:0000:00:01.0
+PM: Adding info for pci:0000:00:07.0
+PM: Adding info for pci:0000:00:07.1
+PM: Adding info for pci:0000:00:07.2
+PM: Adding info for pci:0000:00:07.3
+PM: Adding info for pci:0000:00:07.4
+PM: Adding info for pci:0000:00:07.5
+PM: Adding info for pci:0000:00:0d.0
+PM: Adding info for pci:0000:00:14.0
+PM: Adding info for pci:0000:01:00.0
+PCI: Using IRQ router VIA [1106/0686] at 0000:00:07.0
+spurious 8259A interrupt: IRQ7.
+pty: 256 Unix98 ptys configured
+VFS: Disk quotas dquot_6.5.1
+Journalled Block Device driver loaded
+devfs: v1.22 (20021013) Richard Gooch (rgooch@atnf.csiro.au)
+devfs: boot_options: 0x0
+Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+PCI: Disabling Via external APIC routing
+PM: Adding info for No Bus:pnp1
+isapnp: Scanning for PnP cards...
+isapnp: No Plug & Play device found
+Using anticipatory scheduling elevator
+Floppy drive(s): fd0 is 1.44M
+FDC 0 is a post-1991 82077
+PM: Adding info for platform:floppy0
+Uniform Multi-Platform E-IDE driver Revision: 7.00alpha2
+ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+hda: SAMSUNG SV2044D, ATA DISK drive
+hda: IRQ probe failed (0xffffffba)
+PM: Adding info for No Bus:ide0
+hdb: SAMSUNG SV4084H, ATA DISK drive
+hdb: IRQ probe failed (0xffffffba)
+hdc: ASUS CRW-4012A, ATAPI CD/DVD-ROM drive
+PM: Adding info for No Bus:ide1
+hdd: SAMSUNG COMBO SM-304B, ATAPI CD/DVD-ROM drive
+ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+PM: Adding info for ide:0.0
+PM: Adding info for ide:0.1
+ide1 at 0x170-0x177,0x376 on irq 15
+PM: Adding info for ide:1.0
+PM: Adding info for ide:1.1
+hda: max request size: 128KiB
+hda: 39862368 sectors (20409 MB) w/472KiB Cache, CHS=39546/16/63
+ /dev/ide/host0/bus0/target0/lun0: p1 p2 p3 p4 < p5 p6 p7 >
+hdb: max request size: 128KiB
+hdb: 79730784 sectors (40822 MB) w/426KiB Cache, CHS=65535/16/63
+ /dev/ide/host0/bus0/target1/lun0: p1 p2 p3 p4 < p5 p6 p7 p8 >
+mice: PS/2 mouse device common for all mice
+input: PS/2 Logitech Mouse on isa0060/serio1
+serio: i8042 AUX port at 0x60,0x64 irq 12
+input: AT Set 2 keyboard on isa0060/serio0
+serio: i8042 KBD port at 0x60,0x64 irq 1
+PM: Adding info for platform:eisa0
+EISA: Probing bus 0 at eisa0
+PM: Removing info for platform:eisa0
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP: routing cache hash table of 2048 buckets, 16Kbytes
+TCP: Hash tables configured (established 16384 bind 16384)
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+kjournald starting.  Commit interval 5 seconds
+EXT3-fs: mounted filesystem with ordered data mode.
+VFS: Mounted root (ext3 filesystem) readonly.
+Freeing unused kernel memory: 212k freed
+Adding 265032k swap on /dev/hdb5.  Priority:-1 extents:1
+EXT3 FS on hdb7, internal journal
+Real Time Clock Driver v1.11a
+NTFS driver 2.1.4 [Flags: R/O MODULE].
+SCSI subsystem initialized
+PM: Adding info for No Bus:ide-scsi
+scsi0 : SCSI host adapter emulation for IDE ATAPI devices
+PM: Adding info for No Bus:host0
+  Vendor: ASUS      Model: CRW-4012A         Rev: 1.0 
+  Type:   CD-ROM                             ANSI SCSI revision: 02
+PM: Adding info for scsi:0:0:0:0
+scsi1 : SCSI host adapter emulation for IDE ATAPI devices
+PM: Adding info for No Bus:host1
+ide-scsi: abort called for 4
+ide-scsi: abort called for 5
+ide-scsi: abort called for 6
+scsi scan: 55 byte inquiry failed with code 134217730.  Consider BLIST_INQUIRY_36 for this device
+  Vendor: SAMSUNG   Model: COMBO SM-304B     Rev: BS04
+  Type:   CD-ROM                             ANSI SCSI revision: 02
+PM: Adding info for scsi:1:0:0:0
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on hda3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on hdb3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+NTFS volume version 3.1.
+drivers/usb/core/usb.c: registered new driver usbfs
+drivers/usb/core/usb.c: registered new driver hub
+ehci_hcd: block sizes: qh 128 qtd 96 itd 128 sitd 64
+ohci-hcd: 2003 Feb 24 USB 1.1 'Open' Host Controller (OHCI) Driver (PCI)
+ohci-hcd: block sizes: ed 64 td 64
+drivers/usb/host/uhci-hcd.c: USB Universal Host Controller Interface driver v2.1
+PCI: Found IRQ 11 for device 0000:00:07.2
+PCI: Sharing IRQ 11 with 0000:00:07.3
+PCI: Sharing IRQ 11 with 0000:00:14.0
+uhci-hcd 0000:00:07.2: UHCI Host Controller
+uhci-hcd 0000:00:07.2: irq 11, io base 0000d400
+uhci-hcd 0000:00:07.2: new USB bus registered, assigned bus number 1
+drivers/usb/host/uhci-hcd.c: detected 2 ports
+uhci-hcd 0000:00:07.2: root hub device address 1
+usb usb1: new device strings: Mfr=3, Product=2, SerialNumber=1
+drivers/usb/core/message.c: USB device number 1 default language ID 0x409
+usb usb1: Product: UHCI Host Controller
+usb usb1: Manufacturer: Linux 2.6.0-test4 uhci-hcd
+usb usb1: SerialNumber: 0000:00:07.2
+drivers/usb/core/usb.c: usb_hotplug
+PM: Adding info for usb:usb1
+usb usb1: usb_new_device - registering interface 1-0:0
+drivers/usb/core/usb.c: usb_hotplug
+hub 1-0:0: usb_probe_interface
+hub 1-0:0: usb_probe_interface - got id
+hub 1-0:0: USB hub found
+hub 1-0:0: 2 ports detected
+hub 1-0:0: standalone hub
+hub 1-0:0: ganged power switching
+hub 1-0:0: global over-current protection
+hub 1-0:0: Port indicators are not supported
+hub 1-0:0: power on to power good time: 2ms
+hub 1-0:0: hub controller current requirement: 0mA
+hub 1-0:0: local power source is good
+hub 1-0:0: no over-current condition exists
+hub 1-0:0: enabling power on all ports
+PM: Adding info for usb:1-0:0
+PCI: Found IRQ 11 for device 0000:00:07.3
+PCI: Sharing IRQ 11 with 0000:00:07.2
+PCI: Sharing IRQ 11 with 0000:00:14.0
+uhci-hcd 0000:00:07.3: UHCI Host Controller
+uhci-hcd 0000:00:07.3: irq 11, io base 0000d800
+uhci-hcd 0000:00:07.3: new USB bus registered, assigned bus number 2
+drivers/usb/host/uhci-hcd.c: detected 2 ports
+uhci-hcd 0000:00:07.3: root hub device address 1
+usb usb2: new device strings: Mfr=3, Product=2, SerialNumber=1
+drivers/usb/core/message.c: USB device number 1 default language ID 0x409
+usb usb2: Product: UHCI Host Controller
+usb usb2: Manufacturer: Linux 2.6.0-test4 uhci-hcd
+usb usb2: SerialNumber: 0000:00:07.3
+drivers/usb/core/usb.c: usb_hotplug
+PM: Adding info for usb:usb2
+usb usb2: usb_new_device - registering interface 2-0:0
+drivers/usb/core/usb.c: usb_hotplug
+hub 2-0:0: usb_probe_interface
+hub 2-0:0: usb_probe_interface - got id
+hub 2-0:0: USB hub found
+hub 2-0:0: 2 ports detected
+hub 2-0:0: standalone hub
+hub 2-0:0: ganged power switching
+hub 2-0:0: global over-current protection
+hub 2-0:0: Port indicators are not supported
+hub 2-0:0: power on to power good time: 2ms
+hub 2-0:0: hub controller current requirement: 0mA
+hub 2-0:0: local power source is good
+hub 2-0:0: no over-current condition exists
+hub 2-0:0: enabling power on all ports
+PM: Adding info for usb:2-0:0
+hub 1-0:0: port 1, status 100, change 3, 12 Mb/s
+hub 1-0:0: port 2, status 100, change 3, 12 Mb/s
+hub 2-0:0: port 1, status 100, change 3, 12 Mb/s
+hub 2-0:0: port 2, status 100, change 3, 12 Mb/s
+hub 1-0:0: port 1 enable change, status 100
+hub 1-0:0: port 2 enable change, status 100
+hub 2-0:0: port 1 enable change, status 100
+hub 2-0:0: port 2 enable change, status 100
+drivers/usb/host/uhci-hcd.c: d400: suspend_hc
+drivers/usb/host/uhci-hcd.c: d800: suspend_hc
+ip_tables: (C) 2000-2002 Netfilter core team
+ip_conntrack version 2.1 (2047 buckets, 16376 max) - 304 bytes per conntrack
+PCI: Found IRQ 5 for device 0000:00:07.5
+PCI: Setting latency timer of device 0000:00:07.5 to 64
+apm: BIOS version 1.2 Flags 0x07 (Driver version 1.16ac)
+pnp: the driver 'parport_pc' has been registered
+pnp: match found with the PnP device '00:0f' and the driver 'parport_pc'
+parport0: PC-style at 0x378 [PCSPP,EPP]
+parport0: cpp_daisy: aa5500ff(38)
+parport0: assign_addrs: aa5500ff(38)
+parport0: cpp_daisy: aa5500ff(38)
+parport0: assign_addrs: aa5500ff(38)
+parport_pc: Via 686A parallel port: io=0x378
+lp0: using parport0 (polling).
+ntop uses obsolete (PF_INET,SOCK_PACKET)
