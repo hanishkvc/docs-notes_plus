@@ -1,0 +1,447 @@
+#
+# Major additions or Changes in Linux Kernel 2.6
+# Also some possible directions/issues in future at some places
+#
+# version: 24Aug2003-16:39
+# C Hanish Menon (HanishKVC.com)
+# start: 20 Aug 2003
+# source refered: v2.6.0-test4
+# status: still possible
+#
+
+####### History of Linux ########
+
+* History of India
+  1 - Many kingdoms 
+  2 - Forced Central rule
+  3 - Republic of States
+
+* History of Linux
+  1 - Subsystems with there own minds
+  2 - Forced control of system with Global locks
+  3 - Finegrained locks, Kernel threads, 
+      DeCentralization
+
+As in governing, principal of 
+" Democracy is better than Dictatorship, 
+  but again even Democracy should have some bounds."
+So also in Linux/OS management philosophy.
+
+######## Overview of changes ########
+
+**** For Users
+  * Responsive system
+    * PreEmption * DeCentralized runqueues
+    * Per Zone/Node LRUs * Lazy buddy
+    * MemPools for emergencies
+    * Finegrained locks and ZeroCopy transfers (Block, SCSI, N/W, ...)
+  * Better PnP
+  * Better Power Management
+    * new unified Driver model
+    * CPU freq scaling
+    * better ACPI
+  * Software suspend (Hibernation)
+  * New HALs (uCLinux, UML, AMD64, HyperThreading, ...)
+  * Better support for Devices
+    USB2, ALSA, WLAN
+
+**** For Developers
+  * New Driver model
+  * PreEmption
+  * Finegrained locks and ZeroCopy
+  * New HALs
+  * Block layer restructuring
+  * LSM
+
+**** For Admins
+  * LSM * Extended Attributes 
+  * LinuxVirtualServers * NetFilters, IPSec
+  * UML
+  * SysFS (also DevFS) * Module
+  * Device Mapper, IOSchedulers
+  * Larger IDs and Quota
+
+**** In general/others
+
+######## DeCentralized runqueues to the rescue ########
+Linux has had support for SMP and concept of tasks running at different
+priority levels for a sometime now, however its implementation was still
+using a single runqueue to manage this bemoth. Even thou it managed it
+pretty well, there was scope for improvement, and here is that move
+
+* _Per CPU_ runqueues and related entities(data, lock, ...)
+  * 2 runqueue arrays (active,expired) per CPU.
+    >>SPECIFIC IMPLEMENTATION ISSUE - more of a solution for 
+    LOW LATENCY/PREEMPTIVE kernel  than the general case. <<
+  * each runqueue array contains runqueue for each possible priority 
+
+* Move from a global runqueue to this distributed runqueues helps
+  avoid calculation of goodness factor of tasks and associated statistics
+  calculations. Thus making this a O(1) schedular rather than O(nr_running)
+  
+* Scheduling policy
+  * interactive processes run with higher priority(nice) and get chance
+    on cpu more often, provided they don't hog the cpu
+  * cpu intensive processes run with lower priority but could be 
+    longer timeslices if required
+
+* Rebalancing of runqueues only if a queue is empty or really busy,
+  when associated rebalance tick occurs
+  * Take from busiest runqueue, that to expired tasks if possible
+
+This means =>
+* Lesser wasted time
+* Better CPU affinity and Utilization
+
+######## PreEmption in kernel space for User processes ########
+
+* +Needed for processes that require low latency like UI tasks
+  +Sacrificies throughput slightly for a larger reduction in latency. 
+  +In systems that don't have such requirement, this can be fully avoided.
+  
+* Feature already available in older kernels
+  * Kernel is preemptible wrt Interrupt handlers
+  * System calls which would lead to a wait / external_dependency/ 
+    indeterminate_event would preempt the requesting process _ideally_
+
+* New
+  * Process in kernel space (due to a syscall) can be preempted at any
+    time except when _explicitly disallowed_ (interrupt handlers(NotPossible),
+    SoftIRQs, Schedular, LockedRegions, PerCPUData<You>).
+    * Note protection against preemption in LockedRegions is 
+      >>SPECIFIC IMPLEMENTATION ISSUE- ideally Only those locked regions
+      that are locked to avoid any kind of preemption, for predetermined
+      timed execution of instructions in the region would require this
+      protection. Any other lockedregions used for Mutual exclusion only 
+      doesn't require this protection.<<
+    * Transition from a system where one preempted explicitly only to a 
+      system where one preempts implicitly except when explicitly disallowed.
+  * Issues of Concurrency/Mutual Exclusion & ReEntrency in Kernel space.
+  
+* Note
+  * Kernel is there in the background to be triggered as part of an external
+    event (Int't, Exception/trap) or on the request of the user space.
+    
+* Note to Subsystem/Driver developers >>MOVE TO FINEGRAINED LOCKS<<
+  * Avoid the old cli/sti/save_flags/save_flags_cli/restore_flags
+    instead use <spin/read/write>_<lock/unlock>_<irq/irq<save/restore>>
+    * incase you require to manipulate local interrupts then use
+      local_irq_enable/disable/save/restore, local_save_flags
+  * Protect yourself from preemption (if required like perCPUData(situationX))
+    preempt_enable/disable[_no_resched], 
+    preempt_check_resched(if explicitly disabling preempt indirectly)
+    Or get_cpu, put_cpu[_no_resched]
+
+
+######## HAL and BSP ########
+
+* HAL - low level drivers/subsystems required to run the kernel
+  * Boot loader
+  * Init logic (Board and CPU specific)
+  * Exception handling and Interrupt subsystem
+  * System timer
+  * Memory and Cache management (cache, writebuffer, tlb, pagetable)
+  * IO subsystem
+  * Context switching
+  * Synchronisation primitives
+
+  HAL is used by kernel and inturn everything else.
+
+* BSP - higher drivers required to support a specific board
+  * Ethernet, HDD, Sound, Video, ...
+
+* uCLinux - Linux for NonMMU chips
+  * Embedded systems
+  * Globaly shared memory map
+  * Less secure
+  * More care required for stability
+  
+* UML - Linux within Linux i.e in userspace
+  * Testing
+  * Jail
+  * Virtual machines with a higher level abstraction
+  * Debuging or Learning Linux 
+
+* AMD64, IA64, PPC64
+
+
+######## Linux kernel Device model and SysFS ########
+
+* Consolidation of common data and operations
+  like PlugNPlay, Hotplug, Power, ...
+  Also provides a central repository of buses, devices and 
+  drivers in the system.
+
+* Heirarchical relation
+  (the tree below is logical and not necessarily actual)
+  /sys
+  - bus
+    - bus1
+      - devices
+        - device1 (a symlink to /sys/devices/...)
+          - attribute1
+	  - attributeN (global, bus, class, device - level)
+        - deviceN
+      - drivers
+        - driverXY
+          - deviceZ (a symlink to /sys/devices/...)
+    - busN
+  - class
+    - classX
+      - devices
+        - deviceX (a symlink)
+	  - interfaceX (a symlink)
+      - drivers
+        - driverX (a symlink)
+  - devices ( the actual devices tree)
+    - busX
+  
+  - others (like block, net, firmware)  
+
+* +A bus driver/subsystem will register itself with the kernel.
+  +Inturn it enumerates/discovers the devices connected to it and registers
+   them to the driver model with relation pointing to it. This also occurs 
+   if the device is registered (using add of bus) by a driver(especially 
+   _platform devices_).
+  +When a driver registers with the bus subystem, inturn the bus subsystem
+   registers it with the driver model of the kernel.
+  +When ever a device or driver is registered the current list of registered
+   drivers or devices respectively is searched to see if there is a match
+   between the devices supported by a driver and the currently known devices.
+   The match verification is handled by a bus specific match callback.
+  +Driver can provide device specific implementation of the driver model 
+   core calls, if not the bus subsystem will provide its own implementation
+   of these.
+  +When a device is registered with the driver model core, it calls 
+   /sbin/hotplug, with the required info about the device, action, ...
+   set in enviornment variables. The bus subsystem to which the device is 
+   connected is also given a chance to pass additional info to the userspace, 
+   thro its hotplug callback.
+  +PlatformBus - for core devices/devices that are directly interfaced to the
+   processor(i.e no specialized bus), for bridging logic to other busses, ...
+   +Core devices on a platform could be enumarated by platform specific 
+    support/firmware logic before the associated drivers register (ideally).
+
+* DeviceClasses (n/w, audio, video, ...)
+  Semantic and Interfaces independent of Bus
+
+* uses kobject 
+  kobject - this infrastructure provides basic object management like
+  refcounting, maintianing lists of objects, synchronisation mechanism,
+  userspace representation(sysfs - a ram based filesystem)
+  * Technically sysctl should be built on top of kobject.
+  
+
+######## CPU Frequency scaling (Laptops) ########
+
+subsystem which allows Frequency of the Processor to be changed in a 
+controlled manner. 
+* notifies concerned parties (subsystems, drivers, core(loops_per_jiffy)) 
+  * giving them a chance to update things if any 
+  * handshakes about the new value 
+* gets the change done using specific driver which understands the work
+  Easily extendable >> AS ALWAYS IN LINUX :-) <<
+* Could be triggered by CPU, system or user
+* Helps save power
+
+######## Software Suspend (hibernate) ########
+
+Helps save the current state of the machine into harddisk so that it can be
+later restored to the same state.
+* saves to active swap partition >> ??? <<
+* As hardware state also needs to be restored 
+  in some cases it can be tricky and complex >> OOPS <<
+* use with caution
+* Don't mess with the disk after swsusp
+
+######## Extended Attributes ########
+
+Associate attributes with files and directories
+* system attributes like
+  * ACL
+    Provides old unix style control and
+    New fine grained control
+  * Security module attributes (Capabilities, ...)
+    * Ex: ptracing, file descriptor inheritance, ...
+* user attributes like
+  * mime type
+  * character set used
+  * mount options
+  ...
+
+
+######## Memory subsytem ########
+
+* distribute the logic sensibly and reduce spinlock contention
+
+* huge pages (hugetlbfs)
+  * Allows processes to use memory which are mapped using large 
+    pagesize (> the usual 4k)(usualy 64k/1M(arm), 2/4M(x86)...) 
+    support available in the processor mmu.
+  * This helps reduce the pressure on the TranslationLookAside buffer
+  * User access thro
+    * shared memory or 
+    * mmap of files on mount point of type hugetlbfs
+  * Difference in Mips, Arm and x86 usage of tlb(Caches PageTableEntries)
+    (just to talk about tlb)
+ 
+* reverse mapping
+Each page has a list of PageTableEntries pointing to it.
+  * Helps page replacement logic
+
+* Numa Improvements
+Numa helps work on systems where there are different(logical/physical) memory,
+with different penalties/delays, efficiently and transparently.
+  * Transparently part helps work on systems with discontinguous memory.
+  * PageFrameNumber identifies node begining rather than phyical address
+  * Per node/zone LRU lists and independent instances of kswapd 
+    the page replacement daemon
+  * NUMA is also UMA
+  * PageSet per cpu per Node to improve CPU cache usage
+
+* Non-linear mapping between the VMA and its associated file if any.
+  (mmapped regions - pgoff_x_pte)
+  Nice flexibility but can't it be handled in userspace if required using
+  indirect addressing/table. >> ??? Hee OOPs <<
+
+* Generic memory pool logic
+  * could be used to reserve memory for emergency object creation
+    even when VM is loaded
+
+* Lazy buddy logic for physical page allocation 
+  Delays splitting and coalescing of buddies, unless its necessiated.
+  Allocated as PageSize multiples
+
+* Slab allocator supports slab specific shrink logic and specification
+  of effort involved in recreating the objects in the slab.
+  So we have heuristics based page reclaiming logic.
+  (A cache of slabs for a particular purpose, with memory allocated
+   such that free memory not distributed but contiguous)
+
+* Batch processing of LRU lists with a 2 step logic to avoid lock 
+  contention
+
+
+######## Block and associated layer restructuring ########
+
+* device mapper
+  the core logic to help manage the mapping between logical to physical 
+  sectors - useful for RAID and LVM modules
+
+* more customization
+  Many of these where possible even in the earlier versions but would have
+  involved use of custom/indirect methods by drivers and also double work
+  in some cases if you where lazy >> ADVANTAGE OF OPENSOURCE - You can do
+  things you want even before its supported by reusing those parts that 
+  are common wrt existing logic <<
+  * Driver can notify the generic layer about the device capabilities 
+    and restrictions
+    * Cache/buffer/sector characteristics * DMA caps 
+    * High Memory Area and Bounce buffers
+  * IO Schedulers - can be replaced or configured
+    * adding new request * which queued request to service next
+    * Helps control merging and or sorting of requests
+    * When to service the queued requests
+  * Needs of user of block layer (fs, db)
+    * i/o ordering(barriers, others), 
+      prioritisation of requests (readahead, other cases),
+      raw raw i/o (immidiate execution, custom/specific ATAPI cmds),
+
+
+* independent request_queues for block devices (structure for all seasons(#1))
+  Each request in the queue points to a list of bios. Where a bio
+  inturn could have the data being operated on spread across discontiguous
+  memory segments of different sizes using bio_vecs(#1). One could clone bios
+  which point to the same bio_vecs, required for DeviceMapper based/like
+  logic(#1).
+
+* scsi layer cleanup and finegrained locking around HBA
+
+
+
+######## Networking ########
+**** Linux Virtual Server
+**** IPSec
+**** updation of NetFilter logic
+**** Bridging firewall
+**** SCTP, IP Payload compression
+**** ZeroCopy transfers, ScatterGather DMA (why no kHTTPD)
+
+######## Misc ########
+
+**** ALSA
+
+**** initramfs
+a filesystem(raw/compressed) is embedded into the kernel image and 
+at runtime it is automatically mounted. 
+* basic logic - an old idea (ex: mips).
+* Move certain system initialization code (not needing kernel privelage) 
+  out of kernel (NEW)
+  * boot time networking setup (remote boot m/cs)
+  * mounting of real root filesystem
+  * initrd logic
+  * Firmware (required during init only)
+  ...
+* Technicaly initrd could have done the same. 
+  But maybe a code cleanup and assertion of
+  the fact that a minimal user enviornment is 
+  all thats required, was necessary. >> HEE <<
+
+**** Linux security model/module
+A general framework to support security modules which provide access control,
+auditing, ...
+* Security attributes/fields to kernel data structures
+* Hooks at important points in the kernel code to manage
+  * security attributes
+  * access control/ auditing/ ...
+* Security modules managements
+* Security modules has say on
+  * stacking of hooks across modules
+  * per process hooks if required
+* security model modules available
+  * traditional superuser security model (default)
+  * capabilities model
+  * SecurityEnhancedLinux model
+  ...
+* syscalls for security applications using
+  security syscall and sys_security hook
+
+**** Larger IDs
+UID, GID, PID, ...
+
+**** Improved Posix Threading (NPTL - NGPT = 1:1 1:M M:N ??)
+
+**** hardware monitoring by lm_sensors
+
+**** raw block device
+
+**** V4L2
+
+
+######## the usual stuff ########
+
+* OOM avoidance
+  Don't allow overcommiting beyond set limit, 
+  or disallow vague memory requests,
+  or Leave it to the unknown
+
+* fix race in modules subsystem
+
+* Continuation of finegrained locking
+
+* framebuffer cleaning
+
+
+######## More Info ########
+* Kernel source package 
+  >> WHAT MORE DO YOU WANT along with grep, ctags and vi <<
+* Linux kernel mailing list
+* http://www.kernelnewbies.org/status/
+* http://www.codemonkey.org.uk/post-halloween-2.5.txt
+* that VM changes summarisation for linux 2.6
+
+
+######## To Refresh ########
+* request queues of blocklayer in earlier versions of kernel
+* Network layer parts
+
