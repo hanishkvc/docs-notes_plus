@@ -1,7 +1,7 @@
 ============================================
 Quick KiCad Setup and Usage wrt SCH and PCB
 ============================================
-HanishKVC, v20170322
+HanishKVC, v20191117IST0108
 201X, GPL
 
 C01> Wrt Schematic
@@ -34,6 +34,7 @@ C01> Wrt Schematic
   
   # Generate Netlist
 
+  # Remember to connect PWR_FLAG to power pins (Supply, Gnd), if they are defined as a power supply. 
 
 
 
@@ -76,6 +77,11 @@ C02.01> Basic Setup for Component Footprint creation
   + Use local clearances settings only in special cases where required.
 
 * NOTE: Use space bar to set the origin point for delta distance calculation as and when required.
+
+* Set Reference & Value properties of footprint to REF** (One in F.Silk and one in F.Fab)
+
+* Create a 3d step/stp file, and assign to the component footprint, if you want to see the component in 3D mechanical view.
+
 
 C02.02> Some common PCB Editor settings
 ----------------------------------------
@@ -174,6 +180,8 @@ C02.03> PCB Editor
   NOTE: visible_elements property in kicad_pcb file corresponds to the setting has to what all is enabled 
   or disabled wrt rendering
 
+* Use 't' to select and move footprints
+
 
 C02.04> Stitching Copper Pour/Fill/Zones
 ------------------------------------------
@@ -194,6 +202,8 @@ To create such zone stitching
   "Footprint Properties"->"Local Settings" for these footprints in the PCB.
 
   NOTE: This is because normally we might have set the Zone's property to use thermal relief.
+
+Use 'b' to refill these pours
 
 C02.05> Generating Plots/Gerbers/Drill files
 -----------------------------------------------
