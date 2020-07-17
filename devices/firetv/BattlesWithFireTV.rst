@@ -20,6 +20,10 @@ Have option to show time somewhere in the screen by default, rathing than having
 		To a great extent it is a internet streaming device, so one can assume that most of the time
 		it is being used, it will have network access.
 
+Option to control background audio playback centrally.
+
+	Say a tune-in channel which is playing in the background.
+
 Speech
 --------
 
@@ -30,7 +34,7 @@ Generic speech input for edit boxes (at a minimum, latter expanding to other wid
 	Had assumed this basic form of speech navigation/input given that Amazon seemed to be pushing alexa skills etc.
 	But dissapointed that even basic speech based interaction control, which is decoupled from app specific
 	skills and thus can provide more easier speech support enablment to apps, without much or any effort
-	from app vendors is missing.
+	from app developers is missing.
 
 		Or is it that amazon will be abondoning fire tv for echo (speaker and show) only world.
 
@@ -39,6 +43,9 @@ Generic speech input for edit boxes (at a minimum, latter expanding to other wid
 		even skills, so does it really matter.
 
 Global search (text/audio) not propagating into apps in a smooth manner.
+
+	Some apps seem to support this, but most dont seem to. May be work with app developers to encourage them to support
+	the needed intent or ...
 
 
 Video
@@ -60,7 +67,7 @@ Apps
 
 Silk Browser
 -------------
-	
+
 Use the option button to toggle between full screen and screen with address+tools bar on top.
 
 May be use FF and FR buttons to skip between links on the page (i.e like tab and shift+tab nav on a web page).
@@ -99,4 +106,38 @@ Please stop trying to be the big state brother/sister on the top, who monitors e
 
 	Or what ever else be the reason for the same like better targetting of things or ..., seriously please
 
+Tune In
+--------
+
+No options like
+
+	to bookmark/star/faviorate the channels one likes and organise them
+
+	to select stream bitrate/quality
+
+Why fine grained location info?
+
+
+Google Youtube
+----------------
+
+You know right, you can program to provide locally saved mapping wrt interests/bookmark, history, etc. i.e without signing in.
+
+	Sometimes people may not want to upload their sign-in details in too many devices, for n number of reasons, you know.
+	Its not like people are abondoning you or not wanting to share things with you always, you know (again).
+
+
+NDTV
+------
+
+Allow video quality/bitrate control.
+
+Show date of the video snippets.
+
+India Today
+-------------
+
+Allow video quality/bitrate control.
+
+Video playback buffers and adaptive bitrate switching seems to be insufficient.
 
