@@ -11,6 +11,12 @@ Core
 General
 ---------
 
+Allow going back without deleting in a edit box, by using the back button (there is always prev/fast_back
+button to go back with deleting).
+
+	Currently if one wants to change some spelling somewhere in the middle, one has to delete everything
+	till that middle position.
+
 Have option to show time somewhere in the screen by default, rathing than having to long press home button.
 
 	With potentially not having a battery backed rtc, I can see the reason why its not default,
@@ -60,6 +66,11 @@ because most apps dont seem to provide a option to set the video quality they ar
 		and relatively lower quality for say news apps.
 
 		Current solution seems to fit everything into a single bucket.
+
+Data Monitoring
+----------------
+
+TODO: Not sure if Data usage is being tracked properly. Need to monitor this bit more.
 
 
 Apps
