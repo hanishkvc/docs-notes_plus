@@ -76,9 +76,19 @@ And inturn maintain a position variable, which you manage to track the the curre
 in-focus item of the backend datalist. Inturn ask RecyclerView to bring that element
 position into view/focus by using the scrollToPosition call, as well as manage its
 highlighting when it is in-focus. This inturn needs to use the findViewByPosition
-to find the view associated with that position in the dislayed list. However there
-seems to be a race sometimes, when the display needs to scroll. THis needs to be
-looked at still.
+to find the view associated with that position in the dislayed list.
+
+    However there seems to be a race sometimes, when the display needs to scroll.
+    THis needs to be looked at still.
+
+    After having thinking through once again, the idea that was there in background
+    wrt possible race, as thought, scrollToPosition wasnt doing anything (ie it was
+    not even preparing the updated list of viewholders), instead it potentially is
+    pushing a message into the gui event-loop. So if we create a runnable which will
+    fetch the required views using findViewByPosition and then (de)highlight things
+    as required, and inturn post this also into the gui event-loop toBe called later
+    then everything falls in place properly and one can cycle through the items of
+    the recycler view using keyboard / dpad and interact with it.
 
 
 Java Classes
