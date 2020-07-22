@@ -91,6 +91,10 @@ to find the view associated with that position in the dislayed list.
     the recycler view using keyboard / dpad and interact with it.
 
 
+NOTE: On Android 10 API29, the recyclerview seems to handle key up/down on its own.
+However enter key gets passed to my handler.
+
+
 Java Classes
 --------------
 
@@ -114,5 +118,26 @@ Hope Google keeps the new MANAGE_EXTERNAL_STORAGE based access simple and straig
 forward, after showing the good and valid huge alert to user about what permission
 they are giving to the app.
 
+
+View
+-----
+
+Why not provide a simple getBackgroundColor for views, so that one can try and
+stop oneself from messing with any theme and colors to some extent. Good you
+provide more powerful/complex mechanisms, but why not also a simple stupid
+and straight method which will do for many cases.
+
+
+Intents
+---------
+
+file:/// scheme have been curtailed with FileExposedBeyondApp exception. One will
+have to use either
+
+    FileProvider with grant read permission flag for intent.
+
+    Bypass StictMode.VmPolicy with a dummy
+
+    Share using intent with send action and grant read permission flag.
 
 
