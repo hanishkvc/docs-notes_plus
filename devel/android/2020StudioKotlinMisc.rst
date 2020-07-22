@@ -40,3 +40,69 @@ beyond sane limits for my taste.
         func arg parathesis. So one has all but last arg in the parenthesis
         while the last lamda fun or interface->fun sits outside.
 
+    Using with, let, apply, also for always fine cases with only 2 or 3
+    calls into the corresponding object makes it look ugly, where as the
+    traditional simple code flow where one specifies the object with the
+    call looks neat and makes the flow stupidly clear and evident without
+    needing to think.
+
+
+Android
+========
+
+RecyclerView
+--------------
+
+NOTE: Based on a very quick glance through some parts of RecyclerView documentation.
+
+RecyclerView and its Layout manager should at all times be knowing where a given
+item at a given position in the backend data list resides in the display list (ie
+its position, which could even be -1 or null or ... as it may not be currently
+displayed or in queue for display). But it doesnt seem to provide a mapping between
+these two positions currently, instead there is the findViewByPosition or so,
+which seems to indicate internally it will walk through each item in display+cache
+list. Seems bit odd.
+
+Also for interacting with RecyclerView, the document seems to be proposing a complex
+mechanism. Rather I feel the below flow provides a simpler logic for the simple cases
+atleast.
+
+For trapping mouse/touch events best to setup a onClickListner for the ViewHolder's
+view. And looking at the data embedded in the view holder when the event is triggered
+one can infer what it corresponds to in the backend datalist.
+
+For trapping key events best to setup a onKeyListner for the RecyclerView itself.
+And inturn maintain a position variable, which you manage to track the the currently
+in-focus item of the backend datalist. Inturn ask RecyclerView to bring that element
+position into view/focus by using the scrollToPosition call, as well as manage its
+highlighting when it is in-focus. This inturn needs to use the findViewByPosition
+to find the view associated with that position in the dislayed list. However there
+seems to be a race sometimes, when the display needs to scroll. THis needs to be
+looked at still.
+
+
+Java Classes
+--------------
+
+Path,Files
+~~~~~~~~~~~~
+
+Dont use these currently if you want backward compatibility with older than API26.
+Better to stick with the old and ever available File class, for now.
+
+
+Storage
+---------
+
+Not sure why Google doesnt expose the path associated with a given storage volume,
+got by querying storage manager. Currently one will have to use the hidden getPath++.
+
+For now simpler to use getExternalFilesDirs and then clip out the android app specific
+part of the path to get the base paths wrt the storage volumes.
+
+Hope Google keeps the new MANAGE_EXTERNAL_STORAGE based access simple and straight
+forward, after showing the good and valid huge alert to user about what permission
+they are giving to the app.
+
+
+
