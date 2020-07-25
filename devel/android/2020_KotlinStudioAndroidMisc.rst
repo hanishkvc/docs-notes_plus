@@ -150,6 +150,23 @@ events get processed from
     AND OR bottom to top, where the bottom/inner most logic does its work and then if
     requried and or available call the higher/topper handler/logic.
 
+Trap auto key handling
+
+    Similar to the mouse events, If one provides OnKeyListener for recyclerView's
+    ViewHolder View, then the auto key handling can be trapped. And as usual, if you
+    handle the key event fully in this handler, then return true, else return false
+    so that additional logic provided by android/widget can do its job.
+
+    However if one wants to handle the key events at a higher level in the GUI heirarchy
+    like at the full recyclerView level and not at individual item level, then setting
+    onKeyListener at the recyclerView level doesnt do the job, if focus is enabled for
+    the items, else it will work partly. By partly what I mean is that if one wants
+    focus to flow into the individual recyclerView items, then it wont work, else, i.e
+    if one doesnt want to pass focus to individual items, then recyclerView level
+    OnKeyListener can handle key events.
+
+
+
 
 
 Java Classes
