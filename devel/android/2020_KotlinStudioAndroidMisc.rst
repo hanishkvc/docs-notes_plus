@@ -71,6 +71,9 @@ For trapping mouse/touch events best to setup a onClickListner for the ViewHolde
 view. And looking at the data embedded in the view holder when the event is triggered
 one can infer what it corresponds to in the backend datalist.
 
+Initial
+~~~~~~~~~
+
 For trapping key events best to setup a onKeyListner for the RecyclerView itself.
 And inturn maintain a position variable, which you manage to track the the currently
 in-focus item of the backend datalist. Inturn ask RecyclerView to bring that element
@@ -92,7 +95,61 @@ to find the view associated with that position in the dislayed list.
 
 
 NOTE: On Android 10 API29, the recyclerview seems to handle key up/down on its own.
-However enter key gets passed to my handler.
+However enter key gets passed to my handler. (Update: Rather as enter is converted
+to mouse clicks automatically, that was what was trigggering the required logic
+and not the keydown or keylistener handler).
+
+After some more experimenting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Newer androids make recyclerView items focusable automatically, while older androids
+require the developer to set the focusable manually in the layout xml. So best to
+explicitly set the recyclerView item layout element to be focusable in the layout
+xml file.
+
+NOTE: Currently I have checked that Android API level 25 and below require manual
+intervention wrt making it focusable, while API28 and above handle this implicitly.
+
+If items of recyclerView is focusable, then android/recyclerview/ activity/... code
+handles key event based navigation of recycler view items automatically. However older
+androids dont highlight the item in focus, while newer androids do highlight the item
+in focus. SO best to explicitly set a drawable selector for the recyclerView which
+specifies how the item background should be handled wrt different states like focused,
+activated, pressed, default etc.
+
+THe auto key event handling logic also maps enter/dpad_center press event into normal
+or longpress clicks, so handling the mouse/touch events is good enough to allow dpad
+(i.e tvremote) based navigation also.
+
+THe below two situations among others will require the user to override the auto
+key handling logic, to achieve a custom/better flow
+
+S1) But then as keyboard firmware converts a very long key press into one long
+keypress and multiple short keypresses, so one cant handle keyboard based long press
+properly by default, unless additional code is implemented to filter such situations.
+
+S2) Similarly the auto key handling requires one to navigate through each and every
+focusable element on the screen in sequence. If one wants to use one specific key
+like say left key to jump to some special gui widget/element on the top or bottom or
+so in a screen gui which is having only a vertical recyclerview list, other than the
+special element, it is not possible by default.
+
+    However if that special element only triggers flow similar to what android back
+    should ideally trigger, then android back and its logic itself can achieve what
+    is required.
+
+Setting a onKeyListener for recyclerView doesnt trap/bypass the underlying auto key
+handling that is occuring. Need to check where I require to trap this.
+
+Need to check the documentation to see how android gui events are handled, do the
+events get processed from
+
+    top to bottom, such that the top level logic checks if a lower logic implements
+    a handler, and if so call it and then if it tells its not fully handled, then do
+    its own logic
+
+    AND OR bottom to top, where the bottom/inner most logic does its work and then if
+    requried and or available call the higher/topper handler/logic.
+
 
 
 Java Classes
