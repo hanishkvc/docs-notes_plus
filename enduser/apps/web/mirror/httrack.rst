@@ -4,6 +4,70 @@ httrack
 version: v20200728IST2134
 author: HanishKVC
 
+Usage
+======
+
+The below is based on some experiments and some minimal reading of help pages and forums.
+Havent gone thro the docs properly yet.
+
+General usage
+---------------
+
+httrack site-and-or-its-sub-space-to-mirror [additional-sites-to-mirror] [filters] [options]
+
+options
+~~~~~~~~~
+
+Some of the additional options that could be specified
+
+* -iC1 [--continue]
+
+  continue a interrupted mirror
+
+* -iC2 [--update]
+
+  update a existing mirror
+
+  --updatehack
+
+    Try avoid updating, where possible.
+
+  Updating may not skip existing files, i.e it may not avoid redownloading,
+  even the corresponding pages are fully downloaded, if the server doesnt
+  send back proper info to the query. This can occur very often especially
+  with server side dynamically generated pages.
+
+* %q0
+
+  dont include query string
+
+* -X0 [--purge-old=0]
+
+  dont purge currently non-existant files on server, from the local mirror.
+  Note: by default non-existant files are purged from local mirror.
+
+* --near
+
+  download images,things linked from the webpages being mirrored.
+  But dont get the linked webpages and beyond.
+
+Filters
+~~~~~~~~~
+
++filter_pattern to get urls/links which match the pattern
+
+  +somesite/*images*
+
+    get contents of paths/files on somesite which contain the literal string
+    images in them.
+
+-filter_pattern url/links which match this pattern wont be got
+
+  -somesite*?*
+
+    dont get links with get vars/arguments in them.
+
+
 Websites
 ==========
 
