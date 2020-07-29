@@ -39,7 +39,28 @@ Some of the additional options that could be specified
 
 * %q0
 
-  dont include query string
+  dont include query string. Need to experiment wrt this and understand its
+  implications better, like will it update links with query string in them
+  to point to the saved base page in the mirror without the query string,
+  related impact/info in them.
+
+    If the query string doesnt change the content in any major way, then
+    if it points links with query string in them to the saved base page,
+    it will be very useful. However if the query string changes the content
+    of the page, then this will be a disaster. So need to check the outcome
+    of this option to understand when and where to use it and or not use it.
+
+    example site/some_path?try_cache=false, ignoring query string shouldnt
+    affect in any real way.
+
+    example site/some_path?version=xyz, ignoring query string here potentially
+    shouldnt affect in any real way, unless one always wants the latest and or
+    specific versions of that page/link.
+
+    example site/get_data?key=abc, ignoring query string in this situation
+    could lead to links pointing to wrong data. Rather in this case, the
+    httrack's default behaviour, which is to account for query strings and
+    not ignore them (my current understanding) is the right behaviour.
 
 * -X0 [--purge-old=0]
 
@@ -76,6 +97,9 @@ to the meta data files in the mirror's hts dirs and hts files. And then use
 --continue option. If you use --update option then it will try to update and
 or in worst case (if server is nutty) redownload the already mirrored urls.
 
+TOCHECK: If --continue will update links in already mirrored pages, if the
+new urls provided to continue operation fetch the corresponding pages into
+the mirror.
 
 Websites
 ==========
