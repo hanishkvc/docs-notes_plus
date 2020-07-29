@@ -1,9 +1,14 @@
-==================================
-httrack and developer.android.com
-==================================
+=========
+httrack
+=========
 version: v20200728IST2134
 author: HanishKVC
 
+Websites
+==========
+
+developer.android.com
+-----------------------
 
 * Google Use somthing other than dot '.' as part of file names
   when the '.' doesnt denote a file extension
@@ -25,4 +30,21 @@ author: HanishKVC
   This is adding potentially around 1+MB in a huge majority of
   the pages. This involves thousands of pages, so it is a huge
   overhead.
+
+* In some places there is space in the url path like for
+  developer.android.com/ guide/topics/ui/actionbar.html,
+  refered from kotlin related pages.
+
+* need to avoid urls with ?skip_cache. Otherwise it leads to
+  duplicated files and hierarchies.
+
+* need to avoid urls with #, as these refer to internal bookmarks.
+  Otherwise it leads to duplicated files.
+
+After wasting lot of bandwidth and space, found that there is two
+projects dash and zeal which provide the dataset in a offline manner
+and they seem to have already taken care of nuking devsite-book-nav
+and most of the things which I have mentioned above, so they contain
+a clean offline representation to a great extent.
+
 
