@@ -16,6 +16,26 @@ one is developing with.
 
     https://dl-ssl.google.com/android/repository/docs-24_r01.zip
 
+    Look at zealdocs and or dash (ios) to get more recent sdk/developer
+    documentation.
+
+To add a external library for use in a application. Go to
+
+    File->Project Structure->Dependencies->Modules(apps)->DeclaredDeps
+
+    Next click the + symbol and in the search plus add dialog which comes
+    remember to type the keyword or name with stars on both sides, if you
+    dont get the library you are looking for directly by entering the name
+    of the library. Because there may be multiple versions of the same
+    library provided by different sites and many of them may be very old
+    and or not updated in ages. So to get the actual/valid/supported/latest
+    version of the library, you may have to go through all matching libs
+    for the generic search with * or both sides of the generic search term
+    i.e like say *commons-compress* and then go trough the results carefully
+    and then select the right one. Without star on both sides, you may not
+    find the latest version in some cases like the commons-compress from
+    apache.
+
 
 
 Kotlin

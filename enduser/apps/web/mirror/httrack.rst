@@ -144,4 +144,11 @@ and they seem to have already taken care of nuking devsite-book-nav
 and most of the things which I have mentioned above, so they contain
 a clean offline representation to a great extent.
 
+  This doesnt seem to contain seperate set of documents wrt java and
+  kotlin. Even thou the path seems to refer to the java relate doc
+  paths, the examples in the pages seem to represent kotlin and or
+  there is a bug in zeal wrt switching between the kotlin and java
+  tab links in the embedded samples.
+
+
 
