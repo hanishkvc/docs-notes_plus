@@ -68,6 +68,15 @@ Filters
     dont get links with get vars/arguments in them.
 
 
+Update/Continue
+-----------------
+
+If you want to add new urls to a existing mirror and continue, then add them
+to the meta data files in the mirror's hts dirs and hts files. And then use
+--continue option. If you use --update option then it will try to update and
+or in worst case (if server is nutty) redownload the already mirrored urls.
+
+
 Websites
 ==========
 
