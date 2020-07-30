@@ -158,3 +158,9 @@ Aljazera
 Doesnt seem to honor the video quality selection set in data usage/monitor section of FireTV->setting|preference.
 So ends up eating lot of internet quota one may have. So please do fix this.
 
+HotStar
+---------
+
+The video quality setting gets reset to auto, and one is required to explicitly set it to what one wants again and again.
+
+

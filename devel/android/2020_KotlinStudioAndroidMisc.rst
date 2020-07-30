@@ -1,6 +1,9 @@
 Android Studio
 ===============
 
+Studio
+--------
+
 File->Project-Structure provides the configuration related to project.
 
 Analyze provides options like Check with Lint, etc
@@ -35,6 +38,12 @@ To add a external library for use in a application. Go to
     and then select the right one. Without star on both sides, you may not
     find the latest version in some cases like the commons-compress from
     apache.
+
+AVD
+-----
+
+the android tv api q preview system image triggers lot of background crashes
+or so and it takes a long time to boot up, during which it trashes the disk.
 
 
 
