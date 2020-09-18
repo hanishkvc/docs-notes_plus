@@ -71,6 +71,9 @@ git branch --move oldName newName
 git checkout backup 
 git checkout master 
 
+git reflog
+git checkout -b deletedBranch shaOfLastCommitOfThatBranch
+
 git diff
 git diff commitId
 git diff --cached 
@@ -85,6 +88,11 @@ git log --pretty=fuller
 
 git rebase master 
 git rebase --interactive [branchName|commitId]
+
+get rebase originalBaseBranch
+
+	THis is bit more aggressive at merging compared to just calling merge.
+
 
 git clear
 git fsck
