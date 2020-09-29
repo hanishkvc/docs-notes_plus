@@ -13,39 +13,6 @@ as the files will get written fresh.
 
 
 
-GitHub
-========
-
-Usage
--------
-
-Importing a existing repository
-
-    Create a repository on github
-
-    On your local existing repository do
-
-        git remote add origin git@github.com:username/repositoryname-on-github.git
-
-        git push -u origin master
-
-
-Forks
---------
-Fork is useless, if the upstream doesnt pull from fork. Also
-work you do on fork is not accounted as part of your activities.
-
-TO update the fork
-
-    git pull upstream
-
-    git push origin master
-
-Better to have ones own independent git repository on github,
-with a upstream link into original git repo.
-
-
-
 Examples
 ==========
 
@@ -91,8 +58,8 @@ git rebase --interactive [branchName|commitId]
 
 get rebase originalBaseBranch
 
+	If the base branch from which you branched the current branch, as got updated.
 	THis is bit more aggressive at merging compared to just calling merge.
-
 
 git clear
 git fsck
@@ -117,6 +84,10 @@ git switch -
 
 git tag
 git tag tagName
+
+git cherry-pick ASpecificCommitId
+
+
 
 less .git/config 
 history | grep -i git | cut -d ' ' -f 3- | sort | uniq

@@ -104,13 +104,16 @@ In case you want to change your private key passphrase, do the following
 
 
 
-New Github Repository
-======================
+Github Repository
+====================
+
+Importing a existing repository
+---------------------------------
 
 If you want to setup a github repository for a existing local git repository
 
 Local git repository
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 On your local machine setup your local git repository
 
@@ -123,15 +126,17 @@ On your local machine setup your local git repository
     git commit
 
 Create Github repository
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Login to your github account and create a repository on github.
 
-Link git and github repository
----------------------------------
+
+Link local git and github repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Next link your local git repository to the github repository using the following commands.
 
+On your local existing repository do
 
     git remote add origin git@github.com:YourUserName/YourGithubRepositoryName.git
 
@@ -149,6 +154,27 @@ From now on, one can just do
     git pull
 
     etc...
+
+
+
+Misc
+======
+
+Forks
+--------
+Fork is useless, if the upstream doesnt pull from fork. Also
+work you do on fork is not accounted as part of your activities.
+
+TO update the fork
+
+    git pull upstream
+
+    git push origin master
+
+Better to have ones own independent git repository on github,
+with a upstream link into original git repo.
+
+
 
 
 # vim: set sts=4 expandtab: #
