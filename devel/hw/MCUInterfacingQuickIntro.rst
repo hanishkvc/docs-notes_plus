@@ -1,14 +1,14 @@
-=========================================
+#########################################
 Interfacing to MCU - Quick Generic Intro
-=========================================
+#########################################
 
 Hardware Level
-=================
+#################
 
 For interfacing any Component to a MCU/SOC one has to look from the following angles, among others
 
 Voltage/Current
-~~~~~~~~~~~~~~~~~
+=================
 
 What is the voltage levels of the component's io pins and inturn the operating voltage levels of the MCU's IO pins.
 
@@ -27,7 +27,7 @@ NOTE: Remember to look at the operating electrical charactersistics and not just
 
 
 Analog/Digital
-~~~~~~~~~~~~~~~~
+================
 
 Does the component interface to the MCU over a digital or analog interface.
 
@@ -93,7 +93,7 @@ NOTE: For complex chips interfacing into a SOC, even the power and clock sequenc
 
 
 FPGA
-~~~~~
+=====
 
 If initially testing out on a FPGA, look at the pin mapping between the soft MCU and the FPGA pins.
 
@@ -103,7 +103,7 @@ Look into the Pinout, Pin planning and IOBank/Port specifications of the FPGA us
 
 
 Towards a product
-~~~~~~~~~~~~~~~~~~~
+===================
 
 For any exposed to outside (directly or indirectly) IO pins, look at these as required
 
@@ -123,10 +123,10 @@ Grounding strategy.
 
 
 Software
-==========
+##########
 
 General
-~~~~~~~~
+========
 
 Take note of any watch dog timers and inturn make use of them and or disable them.
 
@@ -168,16 +168,45 @@ Remember to switch to low power modes when done. While ensuring that resources w
 
 
 Linux
-~~~~~~
+======
 
 For a generic device one will usually implement a char device driver based kernel module.
 
 Validate user space data, before use in kernel.
 
 
+Shakti-SOC and Related
+########################
+
+20201014 Peripheral support, boot
+==================================
+
+Some suggestions/thoughts in general
+
+a) Serial Transcievers - As long as the UART logic used is not restricted to legacy clock speeds (as stupidly done on many super io chips),
+one can always connect transceivers for CAN or 485 or ... and use them at higher speeds than legacy uart speeds also. i.e better to have
+a flexible clock path/multipliers based uart and leave bus specific niceties to an external transciever.
+
+b) IO Voltage - With low power in mind, better to stick to 1.8 v IO which can tolerate 3v. And let people use level conversion (transistors/...) for 5V.
+
+And or have Open Drain/Collector IO mode (rather than push-pull) for some of the GPIO pin banks so that one can interface to 1.8 or 3.3 or 5v as required
+by using external pull-ups.
+
+c) Beyond UART, I2C and SPI, it would be good if either SDIO or USB is supported, as one will be able to interface to most other io indirectly through them.
+
+At the same time with SPI support one can always interface to SDIO devices potentially using the mandatory SPI mode of SDIO.
+So interfacing to other standards/peripherals through SDIO is still possible but albeit at a lower speed compared to full SDIO transfer modes.
+
+d) I would assume builtin RF support is going to be potentially further down the line, however in the short term one would need to use uart/spi/sdio(in spi mode)
+to interface to wifi/bt/... offloader chips.
+
+e) support for validated (if not secured/verified) boot, at a minimum using a locked/fused in hash, if not signature based ones, would be a useful 1st step.
+
+
+
 
 Catalog
-=========
+#########
 
 Author: HanishKVC
 
