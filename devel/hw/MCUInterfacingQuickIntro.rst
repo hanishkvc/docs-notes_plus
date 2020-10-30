@@ -178,6 +178,8 @@ Validate user space data, before use in kernel.
 Shakti-SOC and Related
 ########################
 
+Some responses which I gave on the forum, which maybe useful in general
+
 20201014 Peripheral support, boot
 ==================================
 
@@ -201,6 +203,80 @@ d) I would assume builtin RF support is going to be potentially further down the
 to interface to wifi/bt/... offloader chips.
 
 e) support for validated (if not secured/verified) boot, at a minimum using a locked/fused in hash, if not signature based ones, would be a useful 1st step.
+
+
+20201030 Interfacing ESP32, SDCard, Python, ...
+=================================================
+
+Part 1
+-------
+
+Assuming the initial C Class Shakti physical SOC that will be released by IIT++ later wont support Ethernet (Do confirm with IIT once)
+(NOTE: I am not talking about the FPGA version, bcas you can always instantiate other io controller logics in a FPGA be it SDIO or
+Ethernet or ... and interface it to the internal IO bus of Shakti)
+
+The simplest answer to both your questions is SPI i.e you should be able to interconnect ESP32 as a SPI slave to Shakti,
+similarly you should be to talk to a SD card in SPI mode from Shakti.
+
+If both ESP32 and Shakti allow clocking UART to non legacy speeds, even it may help transfer between them.
+
+You will have to look at the maximum clock speeds from both Shakti and ESP32 side wrt SPI and UART and then decide,
+chances are SPI clocks may be bit more flexible compared to UART.
+
+At the same time do remember that, If you want even faster io speeds, if you can
+
+a) spare a bunch of GPIO lines on both chips (if they are in the same bank and share a register, even better),
+
+b) spare the CPU (Shakti and ESP32) i.e the CPU is not loaded for sufficient time in-between other activities,
+
+then technically you maybe able to rig up your own software controlled Parallel or Multi Channel/Line Serial interface provided
+the GPIOs can be switched (needs to be checked once) fast enough.
+
+It may be best to control the SDCard from ESP32 and use the serial/parallel interface between Shakti and ESP32 to access the files.
+How much ram you can spare on either chip and the cpu loading at either of them will also help you decide, whether it makes sense or not finally.
+
+NOTE: As I havent checked Shakti currently, the below is theoretical, but should be definitely possible
+
+If linux is up and running on Shakti along with a sufficiently normal c library, you should be always able to cross compile any other c code
+(be it the regular python flavor or one of the embedded python flavors) to run on it, assuming a linux distro is already not available for riscv.
+However if a linux distro is available you should be able to repurpose binaries from that linux distro provided library versions match sufficiently.
+
+Also if you have no storage device connected to Shakti other than spi boot Flash, then the simplest for you will be to have a ramdisk with
+a minimal filesystem including your version of python in it, bundled along with the linux kernel in the flash.
+
+I am sure the Shakti team will give more appropriate answers, based on the knowledge they have about the final physical SOC which they are planning,
+if that is what you are interested in. However the SPI thing which I mentioned should work irrespective of anything else. Best wishes.
+
+Part 2
+-------
+
+If the physical Shakti SoC will follow the spec mentioned at https://gitlab.com/shaktiproject/sp2020 (IIT Shakti team can clarify on this)
+
+then it doesnt seem to indicate ethernet, if so, then the SPI or UART path what I mentioned in the previous message is the way to go for ESP32 - Shakti handshakes,
+if you want things to work on both FPGA and potential physical SoC versions of Shakti.
+
+If you will be using the Shakti SoC with DDR memory access, then given the limited RAM on ESP32 side, you may want to access the SDCard (in SPI mode) from Shakti SoC side,
+unless the ESP32 is going to be relatively lot more free than Shakti in your setup.
+
+Part 3
+--------
+
+Also before I forget, if you decide to code up ur own software controlled parallel (/multi line serial) bus using gpio's
+(like I had suggested as a possibility in a previous message), remember that
+
+a) you cant expect the data to be available at the other end immidiately after you have written it. You would have noticied
+in timing diagrams of many serial or parallel busses that the clock transition or the read or write enable transition which
+triggers the other end to recognise the fresh data occurs bit delayed compared to the command/data line transition, so that
+there is enough time for the data/cmd lines to settle. You require to ensure the same in your bus.
+
+b) Also chances are the needed settling time would change when going from the FPGA based Soft SOC to the Physical SOC.
+
+side note: using gpios from across different banks/ports rather than all from the same bank/port, may actually help you get
+slightly better throughput sometimes, but then again you shouldnt have to rely on such intricacies normally, bcas rather
+it would mean that you are using the wrong chip for your given situation, if you have to rely on it to get ur logic to work
+with acceptable performance.
+
+Best wishes.
 
 
 
