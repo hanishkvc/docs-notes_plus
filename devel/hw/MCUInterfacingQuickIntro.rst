@@ -279,6 +279,91 @@ with acceptable performance.
 Best wishes.
 
 
+20201031 Python-C, FPGA-SoC-PC ...
+====================================
+
+Part 1
+--------
+
+Depending on how real or rather wall clock time sensitive is the image and data processing you will be doing, you may want to do it in C,
+if you have that possibility, as the speed difference between C and Python code may be pretty significant for even the python interpretation
+around/on-top-off the core image or data processing calls. You may not notice this overhead on a laptop or so which is running in GHz range,
+but if the embedded target is going to run at 200-300MHz (Shakti team can confirm on this), chances are it will have a noticable impact,
+if you need sufficiently fast responses in your system.
+
+But then again, if there is linux kernel and a sufficiently standard c library / runtime running on top of it, you also have the option of
+converting the python code to c using cython module mechanism, but you might still have some minimal triggering vestiges in python, which will
+require the python interpreter, unless someone is willing to dig even deeper wrt those python vestiges to eliminate them beyond what cython provides by default.
+
+If binutils, glibc and gcc is available for Shakti, then I would say 99% (unless I am forgetting something fundamental currently) you can be
+sure to be able to build and run standard python on Shakti, there will be other libraries you may have to build, but it should be fine.
+Note that this should be fine, even if these trinities are cross compile version, rather in that case even your code will have to be cross compiled and nothing else.
+
+Assuming above is true, then whether you are using the Shakti's with DDR or not is what will be critical. If it is the DDR based ones, then the
+python based path could be still fine for you. However if it is the Non DDR version, then memory constraint may not allow using standard python
+and you will have to work with c or embedded python (but this wont be easy unless your image/data processing libraries are pure python).
+But then again given that you have mentioned about camera and image processing etc, the Non DDR version may not be the right SOC choice for you,
+unless we are talking about really very small image resolutions.
+
+NOTE:
+
+Also if your idea was to capture the images using that camera module with esp32 in it and then process it on Shakti, then depending on the image resolution
+and speed required in your end application, soft shakti + fpga may be the path you may have to pursue in which case some of the image processing can be
+off-loaded to a custom logic on fpga, to get the required speed.
+
+Do profile your end use case assuming single threaded (with NO mmx or sse extensions, this is important especially for image or vector/SIMD optimisable end use cases)
+processing occuring at 180-300MHz provided the end physical SOC will be in the 300-500MHz or so range (the reason why I have reduced the speed to be only around 60%
+is because of the differences that will be there wrt caching/out-of-order execution[not there]/branch prediction/hyper-threading [not-there] between Shakti and your
+PC's processor; Shakti team may be able to give the info wrt relative performance between these SOCs and some specific PC processor, then based on the benchmarks used
+the teams can make their own assumptions about possible performance in the end SoC for their application), and then decide whether to go with
+
+a) python or c code running on either FPGA based or Physical Shakti SOC or
+
+b) rather if fpga custom logic is required, in which case physical Shakti SOC is no longer a straight forward answer, and you need to use soft Shakti on fpga,
+
+Hope I have been sufficiently coherent above, Best wishes to all.
+
+
+Part 2
+--------
+
+Just to complete out my previous post, based on a quick glance, there is the newlib based and glibc based gcc tool chains for RiscV.
+
+a) Newlib based tool chain is best for the E Class Shakti. For someone interested in python, chances are, getting the normal python
+running will involve lot of effort (and isnt worth the effort for the Non DDR version), one of the embedded pythons will be the
+right option here either way, if one wants python.
+
+b) WHile the C Class Shakti should have the glibc based gcc tool chain. And getting normal python running here should be relatively straight forward.
+
+
+If moving logic from pc to shakti, one needs to keep in mind
+
+N1) the lack of SIMD, FPU, Out-Of-Order execution as well as
+
+N2) lower clock speeds, single hardware thread and
+
+N3) differences that will be there wrt Cache, branch prediction, ...
+
+and profile accordingly and identify the application mips requirements and then decide on python or c or a combination with fpga
+(the advantage one gets with the soft-ip core version of Shakti).
+
+Hope these help, as a initial rough guide, as one explores further.
+
+
+20201031 Extending Shakti Verilog-BSV
+========================================
+
+Currently I havent looked beyond the user space in RiscV, nor much into Shakti, but still if I am to hazard a guess I would assume that
+the hypervisior mode will have to mess with the flow of atleast some aspects of exception handling, memory and io management and potentially some instructions also
+so if you are looking at modifying the existing RiscV core, then you may be forced to do it in Bluespec, potentially as Shakti's RiscV core is in it.
+
+Now you may be able to do it on top of the generated verilog code also, but then it may turn out to be bit too much of a moving target with updates to either
+Shakti's RiscV core or Bluespec's verilog generator. Nor will others be able to update the Shakti logic easily in a way that it doesnt upset your changes on top
+done at a different stage of the generation flow.
+
+However as I have noted at the beginning, this is my initial guess.
+
+
 
 
 Catalog
