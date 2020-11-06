@@ -19,7 +19,9 @@ Generate a new key pair for use with github
 
     Save the key-pair has id_rsa.github and id_rsa.github.pub. This is usually saved in ~/.ssh/
 
-    NOTE: Dont forget to set a strong passphrase for your private key
+    NOTE: Dont forget to set a strong passphrase for your private key. If you want to change the passphrase do
+
+        ssh-keygen -p -f id_rsa.github
 
     NOTE: Generate additional key-pairs if you want to use different sets for different repositories or groups of repositories or so.
 

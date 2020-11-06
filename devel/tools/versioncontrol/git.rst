@@ -18,6 +18,11 @@ Examples
 
 git init
 
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git config --global core.editor vim
+
+
 git add path/
 git add path/file
 
@@ -86,6 +91,10 @@ git tag
 git tag tagName
 
 git cherry-pick ASpecificCommitId
+
+git rebase --committer-date-is-author-date commit_sha
+git log --pretty=fuller -p
+
 
 
 
