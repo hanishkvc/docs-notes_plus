@@ -1,0 +1,54 @@
+Some quick notes wrt Squeak
+HanishKVC, v2020ABCD
+##############################
+
+
+****N**** Running 32bit Squeak image on a 64bit Linux machine (Debian used below)
+
+sudo apt-get install squeak-vm
+squeak scratch
+unzip Squeak5.2-18229-32bit-All-in-One.zip
+sudo apt-get install multiarch-support
+dpkg --print-architecture
+dpkg --print-foreign-architectures
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install libc6:i386
+sudo apt-get install libstdc++6:i386
+sudo apt-get install xterm:i386
+file Squeak5.2-18229-32bit-All-in-One.app/Contents/Linux-i686/lib/squeak/5.0-201810190412/vm-display-X11.so
+ldd Squeak5.2-18229-32bit-All-in-One.app/Contents/Linux-i686/lib/squeak/5.0-201810190412/vm-display-X11.so
+sudo apt-get install libgl1:i386
+ldd Squeak5.2-18229-32bit-All-in-One.app/Contents/Linux-i686/lib/squeak/5.0-201810190412/vm-display-X11.so
+./squeak.sh
+./squeak.sh ../SqueakApp/the_app.image
+Squeak5.2-18229-32bit-All-in-One.app/Contents/Linux-i686/bin/squeak ../SqueakApp/the_app.image
+
+
+****N**** Misc
+
+Guardians - to check
+
+
+****N**** Using Squeak
+
+In Macintosh <Command>
+In Linux <Alt>
+In Chromebook <Ctrl>
+
+Open a workspace window, Type a command, then
+* <Ctrl>+<d> to run it
+* <Ctrl>+<p> to run and print its result
+* <Ctrl>+<i> to inspect
+* <Ctrl>+<I> to explore
+* <Ctrl>+<q> to autocomplete
+* <Ctrl>+<b> to open browser on currently selected class
+
+NOTE: Most of above can be got from right clicking in workspace window.
+
+
+You can create new Classes and Messages wrt those Classes by using the Systems Browser
+
+
+
