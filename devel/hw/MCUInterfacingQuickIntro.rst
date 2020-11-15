@@ -364,6 +364,92 @@ done at a different stage of the generation flow.
 However as I have noted at the beginning, this is my initial guess.
 
 
+20201115 Linux, SDK, PlatformIO, Vivado, MediaServer, Storage
+===============================================================
+
+What is what
+---------------
+
+When one has a idea, it requires to be translated into a format which can be understood and acted on by the available
+underlying mechanism right.
+
+Now the underlying mechanism could be predefined arithematic or logical processing elements provided by a CPU (either
+hardwired or soft core) or basic digital building blocks or their equivalents like that provided by a FPGA.
+
+Now in either of these cases, one requires tools to convert the idea specified in a relatively high level simple format
+into the underlying mechanism. So the two tools you have mentioned in your list help with these. Compared to a normal pc
+or mobile environment, slightly differently in a way here one eats ones own dog food here.
+
+When there are too many things to do, which inturn require access to multiple (potentially shared) resources, having some logic
+which manages these in a possibly optimal way based on demand and availability will be helpful right. Now I am sure you know
+which in your list provides this.
+
+Sometimes it helps to speed up things, if the intricacies of certain things/subsystems are already handled for you, so that
+you can concentrate on your end application which builds on top of these. The drivers/libraries help with these.
+
+Media Server
+---------------
+
+Think of the different use cases you will be satisfying and the underlying mechanisms/operations involved to achieve the same and
+the time available at hand to achieve the same at runtime. So also how cpu or io intensive the underlying operations are going to be.
+
+You may require to worry about storage, transport/network and if you are going to be bit sophisticated then even transcoding. And
+chances are you require to worry about getting these to work sufficiently parallely at runtime.
+
+Identify has to how cpu or io intensive these operations are. Inturn when the same resource is required to be used like say CPU or
+a specific IO path are they fast enough to allow interleaved use without impacting the end use case.
+
+If you have parallel resources / paths, which can be used, then interleaving can be avoided or reduced.
+
+Look at the bitrates of the media you will be serving and speed of the io path (or rather paths as the case may be here) and check
+if it can be satisfied or not. Also chances are double or multi/ring buffering may help you all many a times, when things are tight.
+
+Now if you are supporting transcoding or so, then chances are you may require the vector/simd support to do things in realtime
+with 300MHz or so speeds.
+
+FPGA / End SOC / ...
+-----------------------
+
+If you are going to be limiting yourselves to the FPGA, and want to go beyond what is provided, then you have lot of flexibility, as
+you can always add more suitable io controllers to the internal bus of the softcore.
+
+Equally if you want to try and support both the FPGA as well as the End SOC later, then things are going to be bit more tight.
+Profile the io paths and if required SIMD (dont remember if the Softcores currently supports this, check the documentation and IIT
+team). And then decide whether you can do things directly from this core and or you require to offload some of the processing to
+additional external logics and or if some simple filesystem with contiguous allocations can aid or so ...
+
+Identifying, mapping and inturn profiling the basic operations, involved in your end use cases, on this platform would be the first
+step to get a feel of how simple or tight the things are going to be and then based on it decide on interleaving or using parallel
+resources or offloading and or ...
+
+NOTE: I have kept the response purposefully bit vague, while hopefully still providing some hints/guidance at a high level, so that
+you all can explore and understand the things/impacts practically on your own.
+
+
+20201115 ePaper Device with Battery, UI framework
+===================================================
+
+If you are looking at using paper display (I assume epaper) and battery, then
+
+a) chances are power is critical to you, in which case check with IIT team wrt the power consumption of the end soc chips which
+they are planning.
+
+b) Equally these epaper displays have low refresh rate and so can also be managed by low speed io paths, allowing them to be
+interfaced with these SOCs (A normal Display cant be interfaced directly to these SOCs unless you are taking the FPGA path and
+maybe a ParallelRGB or LVDS based display controller). So also not sure if the regular Android or Ubuntu GUI is the right display
+manager/subsystem for your end application. A framebuffer based or wayland based simple UI may be the path to take wrt GUI.
+
+You have to think of the memory which will be required by your end use cases, so chances are the SOC with few 100s of KBs of
+ram access is not suitable for your application nor for linux. Which leaves the SOCs with 10s or 100s of MBs of DDR access the
+right SOC choice for you.
+
+Whether you use 32bit or 64bit version doesnt matter much, but for the differences in the pipeline and the end speeds and how
+much of it you require for your end application. If you are looking at something like a ebook reader or so, then the simpler pipeline
+based 32bit SOC may actually be good enough, if you put specific effort to develop few optimised applications, but either way
+definetly you cant be thinking along fancy UI or so.
+
+Hope this helps.
+
 
 
 Catalog
