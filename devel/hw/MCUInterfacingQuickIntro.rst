@@ -451,6 +451,42 @@ definetly you cant be thinking along fancy UI or so.
 Hope this helps.
 
 
+20201116 Shakti SoftCore, Other FPGAs
+========================================
+
+NOTE: Havent actively worked on FPGAs for almost 2 decades now (cost-power- vs end_utility has been a issue, unluckily for me
+;-), but still as I noticed few questions related to this and maybe no response (or I missed it, in which case sorry), and as even I
+may want to look at this in future, so just had a quick glance at the git source of these soft cores on the web just now and based
+on it what I feel is
+
+You need to look at
+
+core_config.inc - which defines the fpga used and the top level fpga source
+
+Makefile - which includes the config file and rules to build the files for programming the fpga (which inturn links into tcl folder)
+
+fpga_top.v and constraints.xdc - which define the pins needed and inturn how it is mapped to a current fpga device used.
+
+So if you want to move it to a new FPGA + board, then look at the constraints and map it to equivalent/suitable pins for this new
+board, and inturn update the constraints file accordingly. Also update the FPGA define. (As the interfaces used/exposed are not
+that fancy, so hopefully may not be that much of a issue).
+
+You will also have to update the references and details wrt the fpga, flash, memory, adc, ... parts in the files in the tcl subfolder.
+i.e the tcl/mig/... files.
+
+Also you have to cross check that timing closure is achieved as required, and logics are matched to suitable resources in the
+FPGA, in a efficient way, where possible/needed. Maybe the IIT team can give details about which are the logics/paths that need
+to be cross verified to be doubly sure things will be fine, wrt their implementation. If one is moving to a tighter and or less
+flexible/powerful FPGA, is when some of these may become a issue. Also currently not sure how using BSV to generate verilog
+impacts things wrt specifying and tracking these.
+
+NOTE: The above is a note based on a quick glance at the files, without looking into the tools involved nor the files in detail, on top
+with a rusty memory wrt the domain now, so take these with a pinch of salt. However hopefully this should still give a rough idea
+as to what and all to look at. Maybe some one from the IIT team or someone who is using fpga's more actively currently can fill in
+more details and potentially the appropriate helper tools to use to generate/modify some of these files and so and more.
+
+
+
 
 Catalog
 #########
