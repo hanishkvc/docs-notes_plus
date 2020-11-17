@@ -32,14 +32,14 @@ Analog/Digital
 Does the component interface to the MCU over a digital or analog interface.
 
 Analog
---------
+~~~~~~~~
 
 Analog could mean varying voltage / current.
 
 So inturn interface through a ADC or DAC or PWM or Gpio (PWM or simple bi-level interpretation or so) and where required Transistors/Opamps/transducers/...
 
 Digital
----------
+~~~~~~~~~
 
 Digital could mean
 
@@ -75,7 +75,7 @@ Handshake IO like Interrupts, Wait/Request/Ack, Enables, Reset, ...
 
 
 GPIO
-------
+~~~~~~
 
 When using GPIOs do keep these in mind
 
@@ -209,7 +209,7 @@ e) support for validated (if not secured/verified) boot, at a minimum using a lo
 =================================================
 
 Part 1
--------
+~~~~~~~
 
 Assuming the initial C Class Shakti physical SOC that will be released by IIT++ later wont support Ethernet (Do confirm with IIT once)
 (NOTE: I am not talking about the FPGA version, bcas you can always instantiate other io controller logics in a FPGA be it SDIO or
@@ -248,7 +248,7 @@ I am sure the Shakti team will give more appropriate answers, based on the knowl
 if that is what you are interested in. However the SPI thing which I mentioned should work irrespective of anything else. Best wishes.
 
 Part 2
--------
+~~~~~~~
 
 If the physical Shakti SoC will follow the spec mentioned at https://gitlab.com/shaktiproject/sp2020 (IIT Shakti team can clarify on this)
 
@@ -259,7 +259,7 @@ If you will be using the Shakti SoC with DDR memory access, then given the limit
 unless the ESP32 is going to be relatively lot more free than Shakti in your setup.
 
 Part 3
---------
+~~~~~~~~
 
 Also before I forget, if you decide to code up ur own software controlled parallel (/multi line serial) bus using gpio's
 (like I had suggested as a possibility in a previous message), remember that
@@ -283,7 +283,7 @@ Best wishes.
 ====================================
 
 Part 1
---------
+~~~~~~~~
 
 Depending on how real or rather wall clock time sensitive is the image and data processing you will be doing, you may want to do it in C,
 if you have that possibility, as the speed difference between C and Python code may be pretty significant for even the python interpretation
@@ -325,7 +325,7 @@ Hope I have been sufficiently coherent above, Best wishes to all.
 
 
 Part 2
---------
+~~~~~~~~
 
 Just to complete out my previous post, based on a quick glance, there is the newlib based and glibc based gcc tool chains for RiscV.
 
@@ -368,7 +368,7 @@ However as I have noted at the beginning, this is my initial guess.
 ===============================================================
 
 What is what
----------------
+~~~~~~~~~~~~~~~
 
 When one has a idea, it requires to be translated into a format which can be understood and acted on by the available
 underlying mechanism right.
@@ -388,7 +388,7 @@ Sometimes it helps to speed up things, if the intricacies of certain things/subs
 you can concentrate on your end application which builds on top of these. The drivers/libraries help with these.
 
 Media Server
----------------
+~~~~~~~~~~~~~~~
 
 Think of the different use cases you will be satisfying and the underlying mechanisms/operations involved to achieve the same and
 the time available at hand to achieve the same at runtime. So also how cpu or io intensive the underlying operations are going to be.
@@ -408,7 +408,7 @@ Now if you are supporting transcoding or so, then chances are you may require th
 with 300MHz or so speeds.
 
 FPGA / End SOC / ...
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If you are going to be limiting yourselves to the FPGA, and want to go beyond what is provided, then you have lot of flexibility, as
 you can always add more suitable io controllers to the internal bus of the softcore.
@@ -484,6 +484,77 @@ NOTE: The above is a note based on a quick glance at the files, without looking 
 with a rusty memory wrt the domain now, so take these with a pinch of salt. However hopefully this should still give a rough idea
 as to what and all to look at. Maybe some one from the IIT team or someone who is using fpga's more actively currently can fill in
 more details and potentially the appropriate helper tools to use to generate/modify some of these files and so and more.
+
+
+20201117 Ram, Storage, SPI (2, QuadSPI) - My funny Alice In Wonderland
+========================================================================
+
+Part 1
+~~~~~~~~
+
+Peripheral connectivity
+----------------------------------
+
+Look at the interfaces provided by the SoC as well as required by the peripheral, that will help you conclude whether they both can
+talk the same language. Or which is the right peripheral to select.
+
+Looking at these SoCs (if you are targeting the end standalone SoCs and not just the FPGA softcore ones) you dont have the
+traditional parallel IO nor high speed differential serial IO busses so Legacy PATA or current SATA or NVMe based storage cant be
+directly connected to these SoCs.
+
+However it does have SPI and you will be able to find either SPI based NAND chips or you can interface SD card over the SPI bus
+(albiet in 1 wire mode rather than the 4 wire mode supported by native SD phy layer). And if you are taking the SPI NAND chip path,
+then currently the SPI interface from these SoCs seem to only support the normal SPI and not the Dual or Quad SPI, so you will be
+limited wrt the throughput accordingly, if it continues to remain the case.
+
+As for RAM, if you are using anything other than Pinaka, you already have external DDR memory access available i.e in Parashu and
+Vajra. In case of Pinaka you could interface SPI SRAM technically if required.
+
+DO NOTE that SPI bus uses a SEPARATE chip select line, so one can always MULTIPLEX few SPI devices on the same SPI bus, if
+required, by using some additional chip select logic to select between the different devices connected to the same bus.
+
+Query to IIT Team
+----------------------------
+
+The documentation seems to indicate that the SoCs support two SPI busses, even the spi bsv file seems to indicate the same, but
+looking at the fpga_top as well as the constraints.xdc, it seems like currently only the SPI bus connected to the on board Flash chip is
+enabled and not the 2nd SPI bus. Is there any specific reason for the same.
+
+This would also mean that if one wants to experiment with SPI devices, then on the current FPGA based SoftCores it may be difficult
+(with the default configuration released by IIT team) because the only enabled SPI bus is connected to the Flash and so one will have
+to lift the SlaveSelect/ChipSelect pin (and add the required additional chip select logic) while connecting wires to other pins of the
+flash and then do what ever SPI interfacing that they may want to do.
+
+Equally the DQ2 and DQ3 signals dont seem to be enabled, again any reason for the same.
+
+OR one will be required to change the configuration i.e fpga_top, constraints file (and any other, if requried)
+
+Am I reading things correctly and is it going to be so complex to interface a SPI device, OR have I goofed up somewhere.
+
+Also do note that I am infering this by looking at the files which are available on the git repository on the web. If these files are
+dynamically generated as part of the build process and inturn if they enable both SPI busses as expected, then may be you may want
+to update the new files into git. Otherwise by looking at what is currently uploaded to gitlab git repository, I feel there is a issue with
+experimenting with SPI devices if required.
+
+Also do note that I dont have access to Arty A7 board, so I have just looked at the schematic and images available on the web wrt this
+board.
+
+Please do correct me, if my reading wrt the SPI interfacing situation is wrong. I feel it will be useful to many who may be looking into
+these, one way or the other
+
+
+Part 2
+~~~~~~~
+
+I think I have realised my goof up, I had forgotten about the pin muxing, so it seems to be exposed throu pinmux
+as mentioned in Soc.bsv.
+
+However please do respond about my query wrt DQ2 and DQ3 being disabled, which would reduce the speed achievable
+over SPI a lot, for devices which support QuadSPI.
+
+NOTE: Downloading the source from git and grepping helped. Even thou the README had the pinmux detail, which I had
+read sometime back, but had forgotten about it, and these queries by many wrt interfacing, made me want to check
+if there was something else I had missed out and created that castle in the air about missing 2nd SPI ;-)
 
 
 
