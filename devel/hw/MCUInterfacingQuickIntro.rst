@@ -178,7 +178,24 @@ Validate user space data, before use in kernel.
 Shakti-SOC and Related
 ########################
 
-Some responses which I gave on the forum, which maybe useful in general
+Some of my queries and responses which I gave on the forum, which maybe useful in general
+
+
+20201003 Datasheet
+====================
+
+I am not a participant in the challenge, but am equally interested in knowing about the details of the actual SOC,
+which will be manufactured and supplied at a later date. Like the package that will be used, pin pitch, pin mapping,
+operating and absolute rating, voltages required and supported on IO pins, etc or put differently the datasheet for the SOC.
+
+If there is a tentative datasheet in existence, it will be of interest and use to many, as chances are there will be
+differences between the FPGA version and the actual implementation like for example operating current rating of the pins
+or any power sequencing requirements or power consumption at different speeds or power modes supported and so on ...
+
+Also want to get it confirmed that the idea is to have a physical SOC at the end and not just a Soft Core, right.
+So that my understanding is correct.
+
+
 
 20201014 Peripheral support, boot
 ==================================

@@ -1,0 +1,62 @@
+#############################
+Freecad: Thermal simulation 
+#############################
+HanishKVC, v20201119IST1913
+
+Create Part
+=============
+
+New -> Part Design
+
+Create body -> Create Sketch -> Select plane (maybe say xy)
+
+Draw the sketch
+
+Pad it
+
+Add to it, or Substract from it.
+
+Thermal analysis
+==================
+
+Switch to FEM
+
+Add a Analysis
+
+Create a FEM Mesh for the part
+
+Specify the material used for making the part. It needs to have info about thermal conductivity, specific heat, ...
+
+Constraints
+
+	Initial temperature
+
+	Any temperature acting or there in any subpart (or full) of the part.
+
+In the Solver???Tools
+
+	Select analysis type (Thermo Mech)
+
+	Whether to simulate till thermo mech steady state or not
+
+	If not thermo mech steady state, then
+
+		End Time and Step Time till which it should simulate
+
+
+	THEN RUN SOLVER
+
+
+Handling results
+
+	Select one of the generated results (the time within simulation/modeling at which you want to see how temperature behaved)
+
+	Click on Show result
+
+	Select temperature in the dialog, to see the impact of all the temperatures on the part.
+
+Limitations
+
+	Currently it doesnt support more than 1 part or rather more than 1 mesh, so work around it where possible.
+
+
