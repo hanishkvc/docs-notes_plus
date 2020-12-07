@@ -25,6 +25,12 @@ Generate a new key pair for use with github
 
     NOTE: Generate additional key-pairs if you want to use different sets for different repositories or groups of repositories or so.
 
+If you are moving the key-pair around, remember that it should not be accessible to the group or others wrt file permissions
+
+    chmod o-rwx ~/.ssh/id_rsa.github
+
+    chmod g-rwx ~/.ssh/id_rsa.github
+
 
 Setup for local use
 --------------------
@@ -41,6 +47,12 @@ Run ssh-agent in your shell / terminal session and let it setup the environment 
 Make ssh-agent aware of your new private key from the above key-pair
 
     ssh-add ~/.ssh/id_rsa.github
+
+To get a list of keys being handled by ssh-agent currently use
+
+    ssh-add -l
+
+    ssh-add -L
 
 
 Using .ssh/config
