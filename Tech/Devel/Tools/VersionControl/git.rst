@@ -59,12 +59,22 @@ git log -p
 git log --pretty=fuller 
 
 git rebase master 
-git rebase --interactive [branchName|commitId]
+git rebase --interactive [branchName|commitId_to_start_from]
+
+        Change the rebase/edit-todo contents as required
+
+                edit - to review and edit the commit after it is applied
+                break - to break before applying the commit
+
 
 get rebase originalBaseBranch
 
 	If the base branch from which you branched the current branch, as got updated.
 	THis is bit more aggressive at merging compared to just calling merge.
+
+git rebase --committer-date-is-author-date commit_sha_to_start_from
+
+
 
 git clear
 git fsck
@@ -92,7 +102,6 @@ git tag tagName
 
 git cherry-pick ASpecificCommitId
 
-git rebase --committer-date-is-author-date commit_sha
 git log --pretty=fuller -p
 
 

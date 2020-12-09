@@ -23,3 +23,16 @@ On ubuntu check these also
 
 	apport-cli
 
+
+Documentation
+===============
+
+Man
+----
+
+To find some function or define within man page use
+
+        Thorough version => man -K string_to_search
+
+        Quick version => man -k string_to_search or apropos string_to_search
+
