@@ -620,6 +620,38 @@ the synchronisation overhead already, reading the gpio data register directly as
 impact cycles much wrt overall logic.
 
 
+Also just to complete the discussion wrt what I mentioned about using a global variable (i.e outside the gpio helper functions)
+within a context for maintaining the GPIO output state, this is mainly useful when the GPIO peripheral/block works at a lower
+clock speed compared to the Processor logic (rather IIT team can clarify this one way or the other wrt Shakti SoCs), and or you
+have input and output gpio pins intermixed and your logic requires to get the current state and mask out the input related bits
+and then use it or so and or similar situations  is when this concept helps. Again mainly in contexts like loops or so where the
+GPIO output state related variable has the chance to get maintained in a cpu register or so ... i.e if speed/cycles is ones core
+concern. Else just reading the GPIO data register, masking as required and updating will be the simple and best thing to do,
+as handled by the current helper functions.
+
+
+
+20201212 Non volatile GPIO addresses
+=====================================
+
+Have a query to IIT team.
+
+In the arduino-IDE-shakti git code repository, any specific reason why volatile keyword is not used for the GPIO related IO.
+Isnt it better/safer to have the address defined with volatile, so that compiler doesnt optimise out repeated/multiple acccesses
+to these registers in any code block, especially with compiler optimisations.
+
+
+20201212 Memory mapped IO register addresses
+==============================================
+
+Also a suggestion wrt the SOC device register manual, it would be useful if the memory addresses to which these memory mapped
+io registers are mapped is mentioned in the document.
+
+Currently one will have to grep the source code to get the actual address used. Also depending on the fpga board used, there seems
+to be a difference in case of the soft cores, which is also all the more reason to capture the addresses in the document, so that
+people can get the address easily based on what setup they are using (from the document).
+
+
 
 Catalog
 #########
