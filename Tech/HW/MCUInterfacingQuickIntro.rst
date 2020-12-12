@@ -608,6 +608,18 @@ variable), you can avoid the need to read the current status of the lines, while
 change lines as required. Also chances are even the gpio logic in the soc will also be only reading from its internal register
 about the last written value for a given gpio, for output gpios, when one reads the gpio register wrt output gpios.
 
+Addendum:
+
+Unless the SoC/MCU uses writes to input gpio pin related bits of a gpio data register to setup pull-up or pull-down on the line,
+chances are it will be discarding any writes to the input gpio pin related bits (of the gpio data register), so even if a given
+port has few input and few output pins, the last para may still apply, however do cross check the SoC gpio documentation.
+
+Also this shared global variable concept wrt updating gpio data register is mainly useful only when a single context modifies
+that gpio port. If multiple threads or processes or drivers are trying to modify gpios from a single gpio port, then given
+the synchronisation overhead already, reading the gpio data register directly as required will be the simple thing and not
+impact cycles much wrt overall logic.
+
+
 
 Catalog
 #########
