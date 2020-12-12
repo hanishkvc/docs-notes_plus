@@ -574,6 +574,39 @@ read sometime back, but had forgotten about it, and these queries by many wrt in
 if there was something else I had missed out and created that castle in the air about missing 2nd SPI ;-)
 
 
+20201211 GPIO access and speeds
+=================================
+
+As you seemed to mention that you cant afford to spend a cycle(s) to read the GPIO register before writing to it,
+just wanted to give this input, just in case.
+
+Do remember that GPIO registor or IO registers for that matter are not like normal registers, where one writes a value
+in a given cycle and then can be sure that its effect is visible down the pipe immidietely. Not only does the internal
+path within SOC affect the speed, but also the kind of loading on the external pin due to the things connected to the
+pin will also affect the rise and fall times, so dont expect the io to work at the same speed as internal registers,
+nor that all GPIOs will behave in the same way, based on your connections they may not. More resistance or capacitance
+in a specific external path will lead to more delay before the effect is felt fully on the line. So also will the drive
+strength on the path (again internal pullup/drive logic or external pull ups or current sink capacity of the path or ...).
+
+Also if you are using byte or half word operations, do keep in mind that loads involving bytes or half words either sign
+or zero extend the read value before writing to the internal register. So be aware of same if intermixing things.
+
+Also you may have to worry about IO fencing in some cases depending on your flow across multiple lines, even if cache is disabled,
+but this depends more on the way things are done inside the SOC, I dont think it will be a issue on Shakti (even shakti ASM manual
+doesnt mention anything about fencing), but in future if porting to other RiscV cores or so, it is also something one may have to
+keep in mind, If one finds some strange behaviours, beyond caching.
+
+Hope this helps in general.
+
+Also before I forget, because of the difference in effective speed between SoC and the GPIO lines/Pheriperals, one can use
+the time it takes for gpio lines to settle to do other operations on the SoC side, so you should be able to spend that few
+cycles to read the gpio status at the beginning.
+
+And also if a given port contains only output pins, then you could maintain the state of the lines in a global variable, and
+by always keeping this variable in sync with what you are writing to the gpio port, (or rather always updating throu this
+variable), you can avoid the need to read the current status of the lines, while still being able to mask and selectively
+change lines as required. Also chances are even the gpio logic in the soc will also be only reading from its internal register
+about the last written value for a given gpio, for output gpios, when one reads the gpio register wrt output gpios.
 
 
 Catalog
